@@ -204,6 +204,27 @@ stofGeo.setAttribute("color", new THREE.BufferAttribute(stofKleur, 3));
 const stof = new THREE.Points(stofGeo, new THREE.PointsMaterial({ size: 0.06, vertexColors: true, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, depthWrite: false }));
 scene.add(stof);
 
+const KRISTAL_PLEK = new THREE.Vector3(0, 5.3, 0.5);
+const kristal = new THREE.Group();
+const kristalKern = stuk(new THREE.OctahedronGeometry(0.42), gloei(0x5fe1d9, 2.2, { flatShading: true }), 0, 0, 0, false);
+kristal.add(kristalKern);
+const kristalRingen = [0.75, 0.92, 1.1].map((r, i) => {
+  const m = stuk(new THREE.TorusGeometry(r, 0.018, 8, 64), metaal(0xe5b04c), 0, 0, 0, false);
+  m.rotation.set(i * 1.1, i * 0.7, 0);
+  kristal.add(m);
+  return m;
+});
+const kristalLicht = new THREE.PointLight(0x5fe1d9, 6, 9, 1.8);
+kristal.add(kristalLicht);
+kristal.position.copy(KRISTAL_PLEK);
+scene.add(kristal);
+const band = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]), new THREE.LineBasicMaterial({ color: 0x5fe1d9, transparent: true, opacity: 0, blending: THREE.AdditiveBlending }));
+band.frustumCulled = false;
+scene.add(band);
+let kristalPuls = 0, volgendeSter = 4;
+const kristalKleur = new THREE.Color(0x5fe1d9), doelKleur = new THREE.Color();
+const gemmen = [], vallend = [];
+
 function wimpelTextuur(rol) {
   const c = document.createElement("canvas");
   c.width = 128; c.height = 280;
@@ -255,7 +276,10 @@ function maakFiguur(rol) {
   const huid = rol === "oracle" ? 0xc9a0b8 : HUID;
   nek.add(stuk(new THREE.SphereGeometry(0.26, 22, 16), mat(huid, { flatShading: false }), 0, 0.22, 0));
   const oogMat = rol === "oracle" ? gloei(0x9ff7ff, 3) : new THREE.MeshStandardMaterial({ color: 0x241811, roughness: 0.3 });
-  for (const x of [-0.09, 0.09]) nek.add(stuk(new THREE.SphereGeometry(rol === "oracle" ? 0.045 : 0.034, 10, 8), oogMat, x, 0.25, 0.232, false));
+  const ogen = [-0.09, 0.09].map(x => { const o = stuk(new THREE.SphereGeometry(rol === "oracle" ? 0.045 : 0.034, 10, 8), oogMat, x, 0.25, 0.232, false); nek.add(o); return o; });
+  const mond = stuk(new THREE.SphereGeometry(0.035, 8, 6), mat(0x5a2a22, { flatShading: false }), 0, 0.12, rol === "koning" || rol === "archmage" ? 0.275 : 0.25, false);
+  mond.scale.set(1.3, 0.3, 0.5);
+  nek.add(mond);
   if (rol !== "oracle") nek.add(stuk(new THREE.SphereGeometry(0.04, 8, 6), mat(0xe0a88a, { flatShading: false }), 0, 0.19, 0.255, false));
   const extra = {};
   const goud = metaal(0xe5b04c);
@@ -452,7 +476,7 @@ function maakFiguur(rol) {
   const leylijn = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.012, 1), new THREE.MeshBasicMaterial({ color: kleur, transparent: true, opacity: 0.15, blending: THREE.AdditiveBlending, depthWrite: false }));
   leylijn.visible = rol !== "koning";
   scene.add(leylijn);
-  return { leylijn, rol, g, lijf, lb, rb, la, ra, nek, extra, tagEl, ballonEl, voetRing, thuis: new THREE.Vector3(), kijkThuis: 0, doel: new THREE.Vector3(), wachters: [], spreekt: 0, leest: 0, loopt: false, fase: Math.random() * 10, zichtbaar: true, decor: null, boek: null };
+  return { ogen, mond, hop: 0, juich: 0, stapTijd: 0, leylijn, rol, g, lijf, lb, rb, la, ra, nek, extra, tagEl, ballonEl, voetRing, thuis: new THREE.Vector3(), kijkThuis: 0, doel: new THREE.Vector3(), wachters: [], spreekt: 0, leest: 0, loopt: false, fase: Math.random() * 10, zichtbaar: true, decor: null, boek: null };
 }
 
 function maakDecor(rol) {
@@ -519,7 +543,7 @@ function plaatsRaad(rollen) {
     f.g.visible = f.zichtbaar;
     f.decor.visible = f.zichtbaar;
     f.leylijn.visible = f.zichtbaar;
-    f.tagEl.style.display = f.zichtbaar ? "" : "none";
+    f.tagEl.style.visibility = f.zichtbaar ? "" : "hidden";
     if (i < 0) continue;
     const a = THREE.MathUtils.degToRad(hoeken[i]);
     f.thuis.set(Math.sin(a) * STRAAL, 0, -Math.cos(a) * STRAAL);
@@ -564,12 +588,42 @@ const klank = {
 };
 
 const orbs = [], vonken = [], bliksems = [], golven = [];
-function schokgolf(pos, kleur) {
+function gem(f) {
+  const m = stuk(new THREE.OctahedronGeometry(0.09), gloei(KLEUR[f.rol] ?? 0xffffff, 3), 0, 0, 0, false);
+  const van = borst(f);
+  m.position.copy(van);
+  scene.add(m);
+  gemmen.push({ m, van, t: 0, zij: (Math.random() - 0.5) * 2 });
+}
+function vuurwerk() {
+  const kleuren = [0xe5b04c, 0x9a7bff, 0xee6aa8, 0x5aa2ea, 0x6cc164, 0xe08a3c, 0x5fe1d9];
+  const gen = generatie;
+  for (let i = 0; i < 9; i++) setTimeout(() => {
+    if (gen !== generatie) return;
+    vonkenBij(new THREE.Vector3((Math.random() - 0.5) * 9, 3.5 + Math.random() * 3, -2 + (Math.random() - 0.5) * 6), kleuren[i % kleuren.length], 70);
+    toon(200 + Math.random() * 300, 0.25, "triangle", 0.05);
+  }, 300 + i * 520);
+}
+function intocht() {
+  if (rustig) return;
+  const gen = generatie;
+  ROLLEN.filter(r => figuren[r].zichtbaar).forEach((r, i) => {
+    const f = figuren[r];
+    if (f.g.position.distanceTo(SPREEKPUNT) < 0.1) return;
+    const deur = new THREE.Vector3(f.thuis.x * 0.25, 0, 9.4 + i * 0.5);
+    f.g.position.copy(deur);
+    f.doel.copy(deur);
+    f.g.rotation.y = Math.PI;
+    setTimeout(() => { if (gen === generatie && f.doel.distanceTo(deur) < 0.01) { f.doel.copy(f.thuis); f.kijkNa = f.kijkThuis; } }, 300 + i * 380);
+  });
+}
+function schokgolf(pos, kleur, groei = 5, begin = 1) {
   const ring = new THREE.Mesh(new THREE.RingGeometry(0.5, 0.62, 64), new THREE.MeshBasicMaterial({ color: kleur, transparent: true, opacity: 0.9, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false }));
   ring.rotation.x = -Math.PI / 2;
   ring.position.set(pos.x, 0.05, pos.z);
   scene.add(ring);
-  golven.push({ ring, leeftijd: 0 });
+  ring.scale.setScalar(begin);
+  golven.push({ ring, leeftijd: 0, groei, begin });
 }
 let confetti = null, straalBundel = null;
 
@@ -695,6 +749,7 @@ async function speelBeurt(b, trace) {
       if (gen !== generatie) return;
       vonkenBij(borst(doel), KLEUR[b.aan] ?? 0x5fe1d9, 40);
       schokgolf(doel.g.position, KLEUR[b.aan] ?? 0x5fe1d9);
+      doel.hop = 0.75;
       for (const r of ROLLEN) if (r !== b.aan && figuren[r].g.position.distanceTo(figuren[r].thuis) > 0.2) loopNaar(figuren[r], figuren[r].thuis, figuren[r].kijkThuis);
       focus = doel;
       await loopNaar(doel, SPREEKPUNT, null);
@@ -718,6 +773,8 @@ async function speelBeurt(b, trace) {
     klank.verdict();
     gouden_straal(true);
     startConfetti(koning.g.position);
+    vuurwerk();
+    for (const r of ROLLEN) { figuren[r].juich = 6; figuren[r].hop = 6; }
     for (let i = 0; i < 3; i++) setTimeout(() => schokgolf(koning.g.position, 0xffcf7a), i * 450);
     zeg(koning, "Het Verdict: " + kort(b.tekst, 190), 9 / tijdschaal);
     await slaap(5200);
@@ -744,6 +801,9 @@ async function speelBeurt(b, trace) {
     zeg(f, tekst, duur / tijdschaal);
     vonkenBij(borst(f), KLEUR[f.rol] ?? 0xffffff, 18);
     schokgolf(SPREEKPUNT, KLEUR[f.rol] ?? 0xffffff);
+    const aantal = Math.min(8, (b.bewijs || []).length);
+    for (let i = 0; i < aantal; i++) setTimeout(() => { if (gen === generatie) gem(f); }, (600 + i * 320) / tijdschaal);
+    if ((b.onbevestigd || []).length) setTimeout(() => { if (gen === generatie) { vonkenBij(borst(f), 0xff4040, 40); klank.bliksem(); } }, 900 / tijdschaal);
     await slaap(duur * 1000);
     if (gen !== generatie) return;
     zwijg(f);
@@ -788,6 +848,8 @@ function zetThuis(alles = true) {
     for (const o of orbs.splice(0)) { scene.remove(o.bol); for (const s of o.spoor) scene.remove(s); o.klaar(); }
     for (const b of bliksems.splice(0)) { scene.remove(b.lijn, b.licht); }
     for (const g of golven.splice(0)) scene.remove(g.ring);
+    for (const g of gemmen.splice(0)) scene.remove(g.m);
+    for (const r of ROLLEN) { figuren[r].juich = 0; figuren[r].hop = 0; }
     gouden_straal(false);
     if (confetti) { scene.remove(confetti.punten); confetti = null; }
     verdictActief = false;
@@ -843,6 +905,7 @@ function ontvang(detail) {
   if (trace.run_id !== huidigeRun) {
     const eerste = huidigeRun === null;
     nieuweRun(trace, eerste);
+    intocht();
   } else if (beurten.length < verwerkt) {
     nieuweRun(trace, true);
   }
@@ -864,6 +927,7 @@ function herbeleef() {
   podium.classList.add("speelt");
   nieuweRun(trace, false);
   herbeleven = true;
+  intocht();
   wachtrij.push(...(trace.beurten || []));
   verwerkt = (trace.beurten || []).length;
   start_verwerker(trace);
@@ -877,13 +941,13 @@ herbeleefKnop.addEventListener("click", herbeleef);
 document.getElementById("snelheid")?.addEventListener("change", e => { snelheid = Number(e.target.value); if (herbeleven) tijdschaal = snelheid; });
 
 const cameraKnop = document.getElementById("camerastand");
-let cameraStand = rustig ? "vast" : "rond";
+let cameraStand = rustig ? "vast" : "regie";
 function zetCamera(stand) {
   cameraStand = stand;
   controls.autoRotate = stand === "rond";
-  cameraKnop.textContent = stand === "rond" ? "Camera: draait rond" : stand === "volg" ? "Camera: volgt de spreker" : "Camera: stil";
+  cameraKnop.textContent = { regie: "Camera: regie", rond: "Camera: draait rond", volg: "Camera: volgt de spreker", vast: "Camera: stil" }[stand];
 }
-cameraKnop.addEventListener("click", () => zetCamera(cameraStand === "rond" ? "volg" : cameraStand === "volg" ? "vast" : "rond"));
+cameraKnop.addEventListener("click", () => zetCamera({ regie: "rond", rond: "volg", volg: "vast", vast: "regie" }[cameraStand]));
 zetCamera(cameraStand);
 const geluidKnop = document.getElementById("geluid");
 geluidKnop.addEventListener("click", () => { geluidAan = !geluidAan; geluidKnop.textContent = geluidAan ? "Geluid: aan" : "Geluid: uit"; if (geluidAan) klank.spreek(); });
@@ -893,6 +957,7 @@ document.getElementById("volscherm").addEventListener("click", () => {
 });
 
 const klok = new THREE.Clock();
+const spel = { actief: false };
 const INTRO_VAN = new THREE.Vector3(9, 15, 24), INTRO_NAAR = new THREE.Vector3(0, 6.4, 11.5);
 let volgendeGlitch = 10 + Math.random() * 10, glitchTot = 0;
 const tijdelijk = new THREE.Vector3();
@@ -903,6 +968,7 @@ function animeer() {
   for (const r of [...ROLLEN, "koning"]) {
     const f = figuren[r];
     if (!f.g.visible) continue;
+    if (f.neer > 0 && spel.neer) { spel.neer(f, dt, t); continue; }
     const pos = f.g.position;
     tijdelijk.copy(f.doel).sub(pos);
     tijdelijk.y = 0;
@@ -921,16 +987,21 @@ function animeer() {
       if (f.extra.armen === undefined) { f.la.rotation.x = -zwaai * 0.5; f.ra.rotation.x = zwaai * 0.5; }
       f.lijf.position.y = Math.abs(Math.sin(t * 10)) * 0.05;
       if (Math.random() < dt * 4) klank.stap();
+      f.stapTijd -= dt;
+      if (f.stapTijd <= 0) { f.stapTijd = 0.22; schokgolf(pos, KLEUR[r] ?? 0xffffff, 0.9, 0.3); }
     } else {
       if (f.loopt) { f.loopt = false; for (const w of f.wachters.splice(0)) w(); }
       f.lb.rotation.x *= 0.8; f.rb.rotation.x *= 0.8;
-      f.lijf.position.y = Math.sin(t * 2 + f.fase) * 0.012;
+      f.lijf.position.y = Math.sin(t * 2 + f.fase) * 0.012 + (f.hop > 0 ? Math.abs(Math.sin(f.hop * 9 + f.fase)) * 0.28 * Math.min(1, f.hop) : 0);
       let doelHoek = f.kijkNa;
       if (f.spreekt > 0 && r !== "koning") doelHoek = Math.atan2(camera.position.x - pos.x, camera.position.z - pos.z);
       if (doelHoek === null || doelHoek === undefined) doelHoek = Math.atan2(KONING_PLEK.x - pos.x, KONING_PLEK.z - pos.z);
       f.g.rotation.y += hoeksnelheid(f.g.rotation.y, doelHoek) * Math.min(1, dt * 4);
       const rustArm = f.extra.armen ?? 0;
-      if (f.spreekt > 0) {
+      if (f.juich > 0) {
+        f.ra.rotation.x += (-2.7 + Math.sin(t * 9 + f.fase) * 0.3 - f.ra.rotation.x) * Math.min(1, dt * 8);
+        f.la.rotation.x += (-2.7 + Math.cos(t * 9 + f.fase) * 0.3 - f.la.rotation.x) * Math.min(1, dt * 8);
+      } else if (f.spreekt > 0) {
         f.ra.rotation.x = -0.9 + Math.sin(t * 3.2 + f.fase) * 0.45;
         f.ra.rotation.z = 0.25 + Math.sin(t * 2.1) * 0.15;
         f.la.rotation.x = rustArm - 0.2 + Math.sin(t * 2.6 + 1) * 0.2;
@@ -946,6 +1017,12 @@ function animeer() {
       }
     }
     if (f.wijst > 0) f.wijst -= dt;
+    if (f.hop > 0) f.hop -= dt;
+    if (f.juich > 0) f.juich -= dt;
+    const knip = Math.sin(t * 0.9 + f.fase * 3) > 0.985 ? 0.1 : 1;
+    for (const o of f.ogen) o.scale.y = knip;
+    f.mond.scale.y = f.spreekt > 0 ? 0.3 + Math.abs(Math.sin(t * 14 + f.fase)) * 0.9 : 0.3;
+    f.tagEl.classList.toggle("actief", f.spreekt > 0 || denker === r);
     if (f.spreekt > 0) f.spreekt -= dt;
     let nekDoel = 0;
     if (focus && focus !== f) {
@@ -1057,15 +1134,60 @@ function animeer() {
     if (b.leeftijd > b.duur) { scene.remove(b.lijn, b.licht); bliksems.splice(i, 1); }
   }
 
+  doelKleur.setHex(focus ? (KLEUR[focus.rol] ?? 0x5fe1d9) : 0x5fe1d9);
+  kristalKleur.lerp(doelKleur, Math.min(1, dt * 2));
+  kristalKern.material.color.copy(kristalKleur);
+  kristalKern.material.emissive.copy(kristalKleur);
+  kristalLicht.color.copy(kristalKleur);
+  kristalPuls = Math.max(0, kristalPuls - dt * 2);
+  kristalKern.material.emissiveIntensity = 2 + Math.sin(t * 2) * 0.5 + kristalPuls * 3;
+  kristal.position.y = KRISTAL_PLEK.y + Math.sin(t * 0.9) * 0.15;
+  kristalKern.rotation.y += dt * 0.6;
+  kristalKern.scale.setScalar(1 + kristalPuls * 0.25 + (t < glitchTot ? (Math.random() - 0.5) * 0.5 : 0));
+  kristalRingen.forEach((m, i) => { m.rotation.x += dt * (0.3 + i * 0.2); m.rotation.y += dt * (0.5 - i * 0.15); });
+  band.material.color.copy(kristalKleur);
+  band.material.opacity += ((focus && focus.spreekt > 0 ? 0.8 : 0) - band.material.opacity) * Math.min(1, dt * 4);
+  if (focus) {
+    const bp = band.geometry.attributes.position, h = focus.g.position;
+    bp.setXYZ(0, kristal.position.x, kristal.position.y, kristal.position.z);
+    bp.setXYZ(1, h.x, h.y + 2.2, h.z);
+    bp.needsUpdate = true;
+  }
+  for (let i = gemmen.length - 1; i >= 0; i--) {
+    const g = gemmen[i];
+    g.t += dt / 1.4;
+    const e = Math.min(1, g.t);
+    g.m.position.lerpVectors(g.van, kristal.position, e * e);
+    g.m.position.x += Math.sin(e * Math.PI) * g.zij;
+    g.m.rotation.y += dt * 6;
+    if (g.t >= 1) { scene.remove(g.m); gemmen.splice(i, 1); kristalPuls = 1; klank.boek(); }
+  }
+  if (!rustig && t > volgendeSter) {
+    volgendeSter = t + 4 + Math.random() * 7;
+    const m = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 2.4), new THREE.MeshBasicMaterial({ color: 0xffffff, fog: false, transparent: true }));
+    const links = Math.random() < 0.5;
+    m.position.set((links ? -1 : 1) * (6 + Math.random() * 16), 13 + Math.random() * 7, -30);
+    const v = new THREE.Vector3((links ? 1 : -1) * (9 + Math.random() * 6), -4 - Math.random() * 3, 0);
+    m.lookAt(m.position.clone().add(v));
+    scene.add(m);
+    vallend.push({ m, v, leeftijd: 0 });
+  }
+  for (let i = vallend.length - 1; i >= 0; i--) {
+    const s = vallend[i];
+    s.leeftijd += dt;
+    s.m.position.addScaledVector(s.v, dt);
+    s.m.material.opacity = Math.max(0, 1 - s.leeftijd / 1.1);
+    if (s.leeftijd > 1.1) { scene.remove(s.m); vallend.splice(i, 1); }
+  }
   for (let i = golven.length - 1; i >= 0; i--) {
     const g = golven[i];
     g.leeftijd += dt;
-    g.ring.scale.setScalar(1 + g.leeftijd * 5);
+    g.ring.scale.setScalar(g.begin + g.leeftijd * g.groei);
     g.ring.material.opacity = Math.max(0, 0.9 - g.leeftijd / 1.2);
     if (g.leeftijd > 1.2) { scene.remove(g.ring); golven.splice(i, 1); }
   }
   sterren.rotation.y += dt * 0.004;
-  if (!rustig && t < 3.4 && laatsteAanraking < 0) {
+  if (!rustig && t < 3.4 && laatsteAanraking < 0 && !spel.actief) {
     const e = 1 - Math.pow(1 - t / 3.4, 3);
     camera.position.lerpVectors(INTRO_VAN, INTRO_NAAR, e);
   }
@@ -1092,15 +1214,22 @@ function animeer() {
     if (glitch) camera.position.x += (Math.random() - 0.5) * 0.12;
   }
 
+  spel.tik?.(dt, t);
+  if (!spel.actief) {
   const sindsAanraking = t - laatsteAanraking;
-  if (cameraStand === "volg" && sindsAanraking > 4) {
+  if ((cameraStand === "volg" || cameraStand === "regie") && sindsAanraking > 4) {
     const doel = focus ? focus.g.position.clone().add(new THREE.Vector3(0, 1.2, 0)) : new THREE.Vector3(0, 1.1, -0.8);
     controls.target.lerp(doel, Math.min(1, dt * 1.5));
+    if (cameraStand === "regie" && focus && t > 3.6) {
+      const fp = focus.g.position;
+      camera.position.lerp(new THREE.Vector3(fp.x + Math.sin(t * 0.25) * 2.5, verdictActief ? 2.4 : 3.3, fp.z + (verdictActief ? 6.2 : 7.2)), Math.min(1, dt * 0.9));
+    }
   } else if (cameraStand !== "volg" && sindsAanraking > 4) {
     controls.target.lerp(new THREE.Vector3(0, 1.1, -0.8), Math.min(1, dt * 0.8));
   }
-  controls.autoRotate = cameraStand === "rond" && sindsAanraking > 6;
+  controls.autoRotate = (cameraStand === "rond" || (cameraStand === "regie" && !focus)) && sindsAanraking > 6;
   controls.update();
+  }
   composer.render();
   labels.render(scene, camera);
 }
@@ -1121,4 +1250,5 @@ pasGrootteAan();
 renderer.setAnimationLoop(animeer);
 window.addEventListener("council-trace", e => ontvang(e.detail));
 if (window.laatsteCouncil) ontvang(window.laatsteCouncil);
-window.raadszaal = { herbeleef, figuren, scene, camera };
+window.raadszaal = { herbeleef, figuren, scene, camera, spel };
+import("./kasteelspel.js").then(m => m.start({ scene, camera, renderer, controls, figuren, maakFiguur, stuk, mat, metaal, gloei, vonkenBij, schokgolf, toon, podium, spel, sterren, maanBol, composer, maan })).catch(e => console.error("kasteelspel", e));

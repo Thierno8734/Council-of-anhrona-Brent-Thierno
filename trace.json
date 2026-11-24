@@ -1,10 +1,6 @@
 {
-<<<<<<< HEAD
-  "run_id": "2026-11-24T14:16:48+01:00_9a866dc0",
-=======
-  "run_id": "2026-11-24T14:23:54+01:00_c3db44e7",
->>>>>>> 39dd04c (FinaleVersie1)
-  "status": "klaar",
+  "run_id": "2026-11-24T15:13:14+01:00_ecea2a8c",
+  "status": "bezig",
   "raadsleden": [
     "archmage",
     "beast_master",
@@ -97,14 +93,13 @@
       "spreker": "koning",
       "soort": "routering",
       "aan": "engineer",
-      "vraag": "Leg de Desync vast aan de hand van de meetbare logs uit het datanet. Welke records (met ID's) tonen de eerste afwijking, op welke dag en op welk tijdstip, en op welke knooppunten of plaatsen trad die op? Geef ook aan hoe vaak de Desync sindsdien voorkwam en of de frequentie toeneemt.",
-      "reden": "Het debat is nog leeg, en meetbare logs wegen zwaarder dan interpretaties. De Engineer hoedt de datatoren en kan het gemeten begin, de plaats en het verloop van de Desync als eerste vaststellen.",
+      "vraag": "Welke meetbare logs van het datanet heb je, met concrete tijdstippen en plaatsen van de eerste Desync-verschijnselen? Geef per waarneming het record-ID, de datum, het tijdstip en de locatie in de datatoren, en vermeld of er ook wijzigingen in de configuratie of firmware van het net zijn vastgelegd rond die momenten.",
+      "reden": "Er is nog niets gezegd, en de Engineer heeft de meetbare logs die de oorzaak het best kunnen staven, dus begin daar om de eerste ongetoetste sporen te kunnen toetsen.",
       "open_vragen": [
-        "Wanneer begon de Desync en welke records (ID's) bevestigen dat tijdstip?",
-        "Op welke plaatsen of knooppunten in het datanet traden de afwijkingen eerst op?",
-        "Wat was de frequentie en is er escalatie over de dagen heen?",
-        "Welke ingreep (wie, wanneer) ging hieraan vooraf?",
-        "Hoe verhouden zich de magische verstoringen tot de datalogs?"
+        "Wanneer en waar verscheen de Desync voor het eerst volgens de meetbare logs?",
+        "Welke ingreep of wijziging ging daaraan vooraf, en door wie?",
+        "Hoe leidt die ingreep tot de symptomen die we waarnemen?",
+        "Is het verloop in de tijd (dagen, frequentie, escalatie) consistent met één gebeurtenis?"
       ]
     },
     {
@@ -112,14 +107,17 @@
       "ronde": 1,
       "spreker": "engineer",
       "soort": "bericht",
-      "tekst": "**Eerste afwijking:** ENG-011, dag 10, 02:40: de hulpslag is geactiveerd in de kelder van de datatoren (ENG-010). Direct daarna meldt ENG-012, dag 10, 03:00, een doorvoer van +38% op het datanet. Dat is een verandering, geen storing. Of dit de Desync is, staat niet in mijn bron.\n\n**Eerste verlies:** ENG-107 (werkboek), dag 10, 04:50: klachten uit de benedenstad over \"half aangekomen\" berichten. Dit is geen vastgesteld knooppunt.\n\n**Meetbare storing:** ENG-026, dag 22, 04:15, poort oost, pakketverlies van drie minuten, status fout. ENG-027 volgt om 04:20 op de firewall.\n\n**Frequentie:** Mijn bron bevat na dag 10 geen andere verliesrecords. Ik kan dus niet vaststellen dat de frequentie toeneemt. Er is één fout na de eerste afwijking, en het log geeft geen volledig beeld van de poorten.\n\n**Mijn eigen mening (niet bron):** Ik vermoed dat de hulpslag de oorzaak is. ENG-027 was gebaseerd op een vermoeden van inbraak, niet op een bewezen aanval. Dat kan ik met mijn logs niet onderbouwen.\n\nMijn bron verwijst naar de Kroonklok, die de hulpslag tot dag 10 aanstuurde. Die klok valt onder een andere Rol; de Koning kan de Historian daarover bevragen.",
+      "tekst": "**Engineer:** Mijn eerste meetbare verschijnsel is de activatie van de hulpslag, geen storing:\n\n- **ENG-011**: dag 10, 02:40, hulpslag in de kelder van de datatoren, geactiveerd als eigen pols, los van de Kroonklok.\n- **ENG-012**: dag 10, 03:00, datanet, doorvoer +38% na activatie. Dit is een meting.\n\nHet eerste afwijkende verschijnsel dat ik in mijn logs vind:\n\n- **ENG-110**: dag 22, 04:15, poort oost, 3 minuten pakketverlies (fout).\n\nKlachten uit de benedenstad, zoals op dag 10 rond 04:50 (werkboek **ENG-107**), zijn geen metingen van mij. Ik weet dus niet of die samenhangen met de hulpslag.\n\nConfiguratiewijzigingen rond die momenten:\n- Vóór dag 10: firmware poort noord (**ENG-073**, dag 4) en poort zuid (**ENG-074**, dag 6).\n- Na activatie, vóór dag 22: firmware voeding (**ENG-015**, dag 11), fijnregeling hulpslag getest en teruggezet (**ENG-061**, dag 12).\n- Na het pakketverlies: firewallregels aangescherpt (**ENG-027**, dag 22, 04:20).\n\nInterpretatie: mijn vermoeden van hackers achter het pakketverlies (**ENG-110**) is geen meting. Ik heb het zelf opgeschreven, en het dient mijn eigen lijn.",
       "bewijs": [
-        "ENG-010",
         "ENG-011",
         "ENG-012",
-        "ENG-026",
+        "ENG-015",
         "ENG-027",
-        "ENG-107"
+        "ENG-061",
+        "ENG-073",
+        "ENG-074",
+        "ENG-107",
+        "ENG-110"
       ],
       "onbevestigd": []
     },
@@ -128,33 +126,46 @@
       "ronde": 1,
       "spreker": "koning",
       "soort": "routering",
-      "aan": "historian",
-      "vraag": "De Engineer meldt ENG-010 en ENG-011: de hulpslag in de kelder van de datatoren werd op dag 10 om 02:40 geactiveerd, en ENG-012 toont om 03:00 een doorvoerstijging van +38%. Die hulpslag werd volgens de Engineer aangestuurd door de Kroonklok, die volgens hem onder uw archief valt. Welke archiefrecords tonen wie de Kroonklok op dag 10 heeft ingesteld, gewijzigd of geactiveerd, en om hoe laat? Zijn er in het archief eerdere gevallen van zo'n klokingreep, en wat volgde daarop (bijvoorbeeld ENG-026 op dag 22)? Noem de ID's.",
-      "reden": "De Engineer verwijst naar de Kroonklok als oorzaak van de hulpslag (ENG-010, ENG-011) en noemt de Historian als Rol die dit kan bevragen. Het ontbrekende deel is de ingreep: wie deed wat en wanneer. De Historian beheert het archief en kan ook vastleggen of dit eerder gebeurde.",
+      "aan": "archmage",
+      "vraag": "Engineer meldt hulpslag ENG-011 (dag 10, 02:40, kelder datatoren), doorvoer +38% in ENG-012, en pakketverlies poort oost ENG-110 (dag 22, 04:15). Welke leylijnmetingen of magische registraties hebt u voor dag 10 rond 02:40 en dag 22 rond 04:15? Wie activeerde de hulpslag, en is de activatie magisch of mechanisch?",
+      "reden": "Engineer's hulpslag-activatie (ENG-011/012) is de eerste ingreep, en de 'hulpslag' ligt op het raakvlak van datanet en magie; de Archmage moet bevestigen of de leylijnen op die tijdstippen iets vertonen.",
       "open_vragen": [
-        "Wie heeft de Kroonklok op dag 10 gewijzigd of geactiveerd, en wanneer precies (ENG-010/ENG-011 zijn niet genoeg)?",
-        "Is de hulpslag (ENG-010) de oorzaak van de doorvoerstijging (ENG-012), of een gevolg van iets anders?",
-        "Hoe verhouden de magische verstoringen (Archmage) zich tot de datalogs en de hulpslag?",
-        "Wat betekent ENG-107 (klachten over 'half aangekomen' berichten in de benedenstad) voor de keten: is het hetzelfde verschijnsel?",
-        "Zijn er eerdere gevallen in het archief van een vergelijkbare ingreep, en wat volgde erop?",
-        "Toont het patroon na dag 22 (ENG-026, ENG-027) een herhaling, en wat was de aanleiding voor de inbraakvermoedens?"
+        "Wie activeerde de hulpslag op dag 10 om 02:40 (ENG-011), en op wiens bevel?",
+        "Is er een koppeling tussen de klachten uit de benedenstad (ENG-107, dag 10, 04:50) en de hulpslag?",
+        "Is het pakketverlies op dag 22 (ENG-110) een aanval of een gevolg van de firmwarewijzigingen (ENG-015, ENG-061)?",
+        "Wat vertoont het verloop tussen dag 10 en dag 22 in de tijd: escalatie of één gebeurtenis?"
+      ],
+      "sporen": [
+        {
+          "spoor": "Hulpslag-activatie dag 10 02:40 veroorzaakt de Desync",
+          "door": "engineer",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Hackers achter het pakketverlies op poort oost",
+          "door": "engineer",
+          "status": "dwaalspoor"
+        },
+        {
+          "spoor": "Firmwarewijzigingen poort noord/zuid en voeding dragen bij aan de Desync",
+          "door": "engineer",
+          "status": "ongetoetst"
+        }
       ]
     },
     {
       "nr": 15,
       "ronde": 1,
-      "spreker": "historian",
+      "spreker": "archmage",
       "soort": "bericht",
-      "tekst": "**Historian**\n\nMijn bron registreert op dag 10 geen ingreep op de Kroonklok: geen instelling, wijziging of activering, ook niet om 02:40 of 03:00. Wel staat er op dag 10 om 04:45 HIS-035: de Burchtader stokte even, en om 04:50 HIS-036: klacht over half aangekomen berichten. ENG-010 tot en met ENG-012 staan niet in mijn bron, dus ik kan ze niet bevestigen.\n\nEerdere klokingrepen in mijn bron zijn de bouw van de Kroonklok (HIS-001), het aanbrengen van de schilden op de pols (HIS-002) en de aansluiting van het datanet (HIS-006). Geen van deze records koppelt een ingreep aan een latere storing.\n\nHIS-110 zegt dat een record op een andere pols alleen daarop terug te lezen is en verloren gaat als die pols wegvalt. Dat past bij HIS-036, maar het is een bouwakte, geen waarneming van een storing.\n\nTegenspraak: HIS-103 stelt dat vastgelegd_op altijd gelijk is aan gebeurd_op. HIS-036 (gebeurd dag 10 04:50, vastgelegd dag 9 23:55), HIS-035 (04:45 tegenover 07:20) en HIS-053 (dag 22 04:15 tegenover 01:50) spreken dat tegen. De Koning kan dat meewegen bij de betrouwbaarheid van de tijdstempels.\n\nENG-026 (dag 22, 04:15) komt overeen met HIS-053: een lek bij poort oost, drie minuten, gemeld door de wachters. Mijn bron spreekt van een fysiek lek, geen pakketverlies. Of de klok daarbij betrokken was, kan ik niet uit mijn bron afleiden. Dat is mijn vermoeden, geen vaststelling.",
+      "tekst": "**Archmage:** Voor dag 10 rond 02:40 en dag 22 rond 04:15 heb ik geen leylijnmeting. Mijn metingen zijn op dag 7, 14, 21, 28, 35 en 42, telkens voor zonsopgang (ARC-001 t/m ARC-084). Ik kan dus niets zeggen over die tijdstippen.\n\nOver de hulpslag weet mijn bron niets. Mijn brieven noemen de datatoren wel: ARC-102 en ARC-106 gaan over de signaalmastlamp en het net. In ARC-106 (dag 8) staat dat de toren mag doorgaan met het net \"op eigen maat\" te laten lopen, en dat het niet ruchtbaar gemaakt moet worden. Dat is twee dagen voor de activatie die Engineer noemt. Wie de hulpslag activeerde, staat er niet. De Koning moet de datatoren daarover bevragen.\n\nMijn eigen uitspraak dat het datanet de leylijnen vervuilt (ARC-109, ARC-116) is interpretatie. Ik vind die uitspraak zelf sterk, maar de metingen op dag 14 en 42 tonen alleen lage waarden, geen oorzaak.",
       "bewijs": [
-        "HIS-001",
-        "HIS-002",
-        "HIS-006",
-        "HIS-035",
-        "HIS-036",
-        "HIS-053",
-        "HIS-103",
-        "HIS-110"
+        "ARC-001",
+        "ARC-084",
+        "ARC-102",
+        "ARC-106",
+        "ARC-109",
+        "ARC-116"
       ],
       "onbevestigd": []
     },
@@ -163,33 +174,55 @@
       "ronde": 1,
       "spreker": "koning",
       "soort": "routering",
-      "aan": "archmage",
-      "vraag": "De Historian bevestigt geen ingreep op de Kroonklok op dag 10 (geen record om 02:40 of 03:00), en de Engineer meldt ENG-010 en ENG-011: de hulpslag in de kelder van de datatoren werd om 02:40 geactiveerd, gevolgd door ENG-012 om 03:00 met +38% doorvoer. Wie of wat heeft op dag 10 om 02:40 de Kroonklok of de hulpslag aangestuurd? Zijn er in uw bronnen over de leylijnen en de magie van de Kroonklok meetbare afwijkingen rond 02:40 tot 03:00 op dag 10, en sluiten die aan bij HIS-035 (dag 10, 04:45, Burchtader stokte) en HIS-036 (dag 10, 04:50, half aangekomen berichten)? Noem de records en de tijdstippen, en geef aan of een magische aantasting van de klok het tijdstip van ENG-011 kan verklaren.",
-      "reden": "De Historian ontkent een klokingreep en de Engineer verwijst naar een Rol die dat niet bevestigt, dus het deel 'wie deed wat, wanneer' ontbreekt nog. De Archmage hoedt de magie waarop de Kroonklok en de hulpslag mogelijk draaien, en heeft nog niet gesproken; de vraag sluit aan op ENG-011 en HIS-035/HIS-036 en moet de ingreep op dag 10 om 02:40 invullen.",
+      "aan": "guardian_keeper",
+      "vraag": "Bewaker, de Engineer meldt hulpslag ENG-011 (dag 10, 02:40, kelder datatoren, geactiveerd als eigen pols). Archmage noemt ARC-106 (dag 8): de toren mag het net 'op eigen maat' laten lopen, niet ruchtbaar maken. Hebt u schildlogs of toegangsregisters van die kelder rond dag 10, 02:40? Wie had toegang, en was er een bres in de schilden?",
+      "reden": "Engineer (beurt 13) en Archmage (beurt 15) geven geen identiteit van de activator; de bewaker van de schilden kan toegangs- of breslogs bevestigen of weerleggen rond ENG-011.",
       "open_vragen": [
-        "Wie heeft de Kroonklok of de hulpslag op dag 10 om 02:40 geactiveerd of gewijzigd, en welk record bevestigt dat (ENG-011 is nog niet gedekt door een archiefrecord)?",
-        "Is de hulpslag (ENG-010) de oorzaak van de doorvoerstijging (ENG-012), of een gevolg van iets anders?",
-        "Wat betekent ENG-107 / HIS-036 (half aangekomen berichten in de benedenstad) voor de keten: is het hetzelfde verschijnsel als de pakketverliezen?",
-        "Waarom spreken HIS-103 en de tijdstempels van HIS-035, HIS-036 en HIS-053 elkaar tegen, en welke tijdstempels zijn betrouwbaar?",
-        "Is het lek bij poort oost op dag 22 (ENG-026, HIS-053) een fysiek lek of pakketverlies, en is de klok daarbij betrokken?",
-        "Wat was de aanleiding voor de inbraakvermoedens (ENG-027), en is er een bewezen aanval?"
+        "Wie activeerde de hulpslag op dag 10 om 02:40 (ENG-011), en op wiens bevel?",
+        "Verklaart de hulpslag de doorvoerstijging van +38% (ENG-012) en de klachten uit de benedenstad (ENG-107, dag 10, 04:50)?",
+        "Hangt het pakketverlies op dag 22 (ENG-110) samen met de firmwarewijzigingen (ENG-015, ENG-061) of met de activatie?",
+        "Wat zegt ARC-106 (dag 8) precies over 'eigen maat', en wie gaf die opdracht?",
+        "Wijzen de dierlijke onrust of de historische archieven op dag 10 of dag 22 als keerpunt?"
+      ],
+      "sporen": [
+        {
+          "spoor": "Hulpslag-activatie dag 10 02:40 veroorzaakt de Desync",
+          "door": "engineer",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Hackers achter het pakketverlies op poort oost",
+          "door": "engineer",
+          "status": "dwaalspoor"
+        },
+        {
+          "spoor": "Firmwarewijzigingen poort noord/zuid en voeding dragen bij aan de Desync",
+          "door": "engineer",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Datanet vervuilt de leylijnen",
+          "door": "archmage",
+          "status": "dwaalspoor"
+        },
+        {
+          "spoor": "Datatoren laat het net 'op eigen maat' lopen en houdt dit geheim (ARC-106)",
+          "door": "archmage",
+          "status": "ongetoetst"
+        }
       ]
     },
     {
       "nr": 17,
       "ronde": 1,
-      "spreker": "archmage",
+      "spreker": "guardian_keeper",
       "soort": "bericht",
-      "tekst": "**Archmage**\n\nMijn bron bevat geen record over de Kroonklok of de hulpslag op dag 10. ENG-010 en ENG-011 staan er niet in, dus ik kan ze niet bevestigen, en ik kan niet zeggen wie of wat om 02:40 heeft ingegrepen.\n\nWat ik wel kan vastleggen: ARC-104 (dag 5) meldt dat de Kroonklok is gestemd zonder afwijking. Daarna volgt in mijn bron geen klokrecord meer. De klokkenmeester is hiervoor de aangewezen Rol; de Koning kan hem bevragen.\n\nMijn leylijnmetingen missen dag 10 volledig. ARC-001 tot en met ARC-014 (dag 7) liggen binnen de marge. ARC-015 tot en met ARC-028 (dag 14) staan allemaal laag, met ARC-015 als eerste stokking van de Burchtader. Dat is dus vier dagen later dan HIS-035 beweert. Ik kan HIS-035 daarom niet bevestigen.\n\nARC-102 en ARC-106 noemen de datatoren: de signaalmastlamp werd 's nachts gedimd en het net liep \"op eigen maat\". Mijn bron dateert dat niet op dag 10. Dat moet de Koning bij de datatoren nagaan.\n\nMijn eigen mening, niet bron: ik denk dat een magische aantasting van de klok het tijdstip van ENG-011 kan verklaren, omdat ARC-109 het datanet de schuld geeft van zwakke leylijnen. Mijn bron kan dat niet aantonen.",
+      "tekst": "**Guardian Keeper:** Ik heb geen schildlog of toegangsregister van de kelder van de datatoren. Mijn bron gaat over de zes schilden, niet over die kelder, en dag 10 om 02:40 staat er niet in.\n\nWel dit: op dag 10 om 04:47 ging het schild van de benedenstad twee minuten van binnenuit open (GUA-019, ook GUA-111). De zegels waren intact, de oorzaak is niet vastgesteld. Dat ligt twee uur na het tijdstip van de hulpslag en gaat over een ander schild. Ik kan die twee niet aan elkaar koppelen. Engineer noemt een klacht om 04:50 (ENG-107); die heb ik niet.\n\nEen breuk van buitenaf zou de zegels breken (GUA-105). Die waren intact, dus er is geen bres van buitenaf vastgesteld. Over wie toegang had tot de kelder kan ik niets zeggen; de Koning moet de datatoren bevragen.\n\nWat ik wel kan bevestigen: dag 22 om 04:15 ging poort oost drie minuten van binnenuit open (GUA-043), hetzelfde tijdstip en schild als Engineer's pakketverlies ENG-110.",
       "bewijs": [
-        "ARC-001",
-        "ARC-014",
-        "ARC-015",
-        "ARC-028",
-        "ARC-102",
-        "ARC-104",
-        "ARC-106",
-        "ARC-109"
+        "GUA-019",
+        "GUA-043",
+        "GUA-105",
+        "GUA-111"
       ],
       "onbevestigd": []
     },
@@ -198,32 +231,64 @@
       "ronde": 1,
       "spreker": "koning",
       "soort": "routering",
-      "aan": "engineer",
-      "vraag": "Engineer, u heeft ENG-011 (dag 10, 02:40, hulpslag geactiveerd) en ENG-012 (dag 10, 03:00, +38% doorvoer) als eerste afwijking aangewezen. Uw logs zijn meetbaar, dus kunt u vastleggen wat ENG-011 veroorzaakte: welk proces, commando of gebruiker de hulpslag startte, en of de bron de Kroonklok of een andere aansturing was. Noem het veld of record in de logs dat dit aantoont. Daarnaast: ARC-102 en ARC-106 melden dat de signaalmastlamp in de datatoren 's nachts werd gedimd en dat het net 'op eigen maat' liep. Kunt u uit uw logs dateren op welke dag en tijd dat gebeurde, en of dat overeenkomt met dag 10 (02:40 tot 04:50) of met de stokking die ARC-015 op dag 14 meldt? Tot slot: ENG-107 (dag 10, 04:50, half aangekomen berichten) en ENG-026 (dag 22, 04:15, poort oost) zijn volgens de Historian mogelijk verschillende verschijnselen. Kunt u aangeven of uw logs bij ENG-107 pakketverlies of een fysiek lek laten zien?",
-      "reden": "ENG-011 is het enige meetbare record van de ingreep op dag 10, en de Historian en Archmage bevestigen geen klokrecord, dus de bron van de activering moet uit de datatoren-logs komen. ARC-102 en ARC-106 raken de datatoren, en alleen de Engineer kan die dagdatering verifiëren.",
+      "aan": "historian",
+      "vraag": "Historicus, de Koning vraagt u het archief na te lopen. Engineer meldt hulpslag ENG-011 (dag 10, 02:40, kelder datatoren, geactiveerd als eigen pols, ENG-012 doorvoer +38%). Archmage noemt ARC-106 (dag 8): het net mag 'op eigen maat' lopen. Guardian Keeper meldt GUA-043 (dag 22, 04:15, poort oost, binnenuit open), gelijk aan ENG-110. Bestaat er een reglement of akte voor activatie van de hulpslag, en wie mag die bevelen? Staat er een bevel van dag 8 of 10 in het archief?",
+      "reden": "Het archief kan het ontwerp of reglement van de hulpslag bevatten en bevestigen of ARC-106 een bevel was; dat toetst het spoor 'hulpslag-activatie veroorzaakt de Desync' en de vraag wie activeerde.",
       "open_vragen": [
-        "Wie of wat activeerde de hulpslag (ENG-011) op dag 10 om 02:40, en welk record bevestigt dat?",
-        "Is de Kroonklok betrokken bij die activering, of gaat het om een andere aansturing? De klokkenmeester die de Archmage noemt, is niet in de Raad vertegenwoordigd.",
-        "Wanneer viel de signaalmastlamp in de datatoren uit (ARC-102, ARC-106), en klopt dat met dag 10 of met dag 14 (ARC-015)?",
-        "Welke tijdstempels zijn betrouwbaar: HIS-035, HIS-036 en HIS-053 spreken HIS-103 tegen, en ARC-015 zegt dag 14 terwijl HIS-035 dag 10 zegt.",
-        "Is ENG-107 pakketverlies of een fysiek lek, en is het hetzelfde verschijnsel als ENG-026 op dag 22?",
-        "Is er een bewezen aanval (ENG-027), of was de inbraakverdenking enkel een vermoeden?"
+        "Wie activeerde de hulpslag op dag 10 om 02:40 (ENG-011), en op wiens bevel?",
+        "Verklaart de hulpslag de doorvoerstijging (ENG-012) en de klacht uit de benedenstad (ENG-107, dag 10, 04:50)?",
+        "Wat is de oorzaak van de binnenuit-opening op dag 22 om 04:15 (GUA-043, poort oost) naast het pakketverlies (ENG-110)?",
+        "Hangen de firmwarewijzigingen (ENG-073, ENG-074, ENG-015, ENG-061) samen met de Desync, en wanneer begon die?",
+        "Wijzen de dierlijke onrust of de archieven op dag 10 of dag 22 als keerpunt?"
+      ],
+      "sporen": [
+        {
+          "spoor": "Hulpslag-activatie dag 10 02:40 veroorzaakt de Desync",
+          "door": "engineer",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Hackers achter het pakketverlies op poort oost",
+          "door": "engineer",
+          "status": "dwaalspoor"
+        },
+        {
+          "spoor": "Firmwarewijzigingen poort noord/zuid en voeding dragen bij aan de Desync",
+          "door": "engineer",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Datanet vervuilt de leylijnen",
+          "door": "archmage",
+          "status": "dwaalspoor"
+        },
+        {
+          "spoor": "Datatoren laat het net 'op eigen maat' lopen en houdt dit geheim (ARC-106)",
+          "door": "archmage",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Binnenuit-opening dag 22 04:15 bij poort oost hangt samen met het pakketverlies (GUA-043, ENG-110)",
+          "door": "guardian_keeper",
+          "status": "bevestigd"
+        }
       ]
     },
     {
       "nr": 19,
       "ronde": 1,
-      "spreker": "engineer",
+      "spreker": "historian",
       "soort": "bericht",
-      "tekst": "**Engineer**\n\n**Wie startte ENG-011:** Mijn installatielog heeft geen veld voor gebruiker of commando. Het werkboek vermeldt wel dat ik de hulpslag om 02:40 zelf heb geactiveerd (ENG-106, dag 10). Dat is mijn handeling, geen externe aansturing.\n\n**Kroonklok:** Mijn eerdere bewering dat de hulpslag door de Kroonklok werd aangestuurd, strookt niet met ENG-011. Daar staat: \"geactiveerd: eigen pols voor het datanet, los van de Kroonklok\". ENG-102 (dag 2) beschrijft het oude datanet als lopend op de Kroonklok. Dat is een andere situatie, en ik had die twee niet mogen samenvoegen.\n\n**Signaalmastlamp:** Mijn bron dateert het dimmen op dag 3, 15:00 (ENG-071, \"lamp 's nachts gedimd, op verzoek per brief\"). Dat is niet dag 10 en niet dag 14. ENG-115 (dag 3) bevestigt hetzelfde. Ik vind in mijn logs geen dimming op dag 10 of 14.\n\n**ENG-107 en ENG-026:** ENG-107 is een werkboekaantekening en noemt \"half aangekomen\" berichten en een kasboek dat even leeg zag. Het woord pakketverlies staat er niet. Het is geen fysiek lek, maar ik kan ook niet vaststellen dat het pakketverlies was. ENG-026 is wel een gelogd pakketverlies van drie minuten op poort oost, status fout.\n\n**Eigen mening (geen bron):** Ik blijf de hulpslag verdacht vinden, omdat de verschijnselen op dag 10 erna begonnen. Maar mijn bron bewijst geen oorzaak-gevolgrelatie.",
+      "tekst": "**Historian:** Mijn Kennisbron bevat geen reglement of akte voor het activeren van een hulpslag, en zegt niet wie zo'n bevel mag geven. Geen record noemt een hulpslag of de kelder van de datatoren.\n\nOp dag 8 staat niets over het net of de toren (HIS-028 t/m HIS-031). Op dag 10 staan twee relevante records: de Burchtader stokte rond 04:45, gemeld door de nachtwake (HIS-035), en een klacht uit de benedenstad over half aangekomen berichten, rond 04:50 (HIS-036). Bij HIS-036 is vastgelegd_op dag 9 23:55, dus vóór het gebeuren. Dat is een tijdstempelafwijking die ik niet kan verklaren.\n\nDe bouwakte van de Kroonklok (HIS-038, gevonden dag 11) noemt een \"tweede pols\" die het systeem uit de maat brengt (kroniek HIS-109 en HIS-110). Die akte is van vóór de gebeurtenissen en zegt niets over wie activeert.\n\nInterpretatie: mijn opmerking dat een oude vloek zich herhaalt (kroniek HIS-114) is mijn eigen overtuiging. Geen meting draagt haar.",
       "bewijs": [
-        "ENG-011",
-        "ENG-026",
-        "ENG-071",
-        "ENG-102",
-        "ENG-106",
-        "ENG-107",
-        "ENG-115"
+        "HIS-028",
+        "HIS-031",
+        "HIS-035",
+        "HIS-036",
+        "HIS-038",
+        "HIS-109",
+        "HIS-110",
+        "HIS-114"
       ],
       "onbevestigd": []
     },
@@ -232,31 +297,79 @@
       "ronde": 1,
       "spreker": "koning",
       "soort": "routering",
-      "aan": "guardian_keeper",
-      "vraag": "Guardian Keeper, u heeft nog niet gesproken. De Engineer meldt ENG-026 (dag 22, 04:15, pakketverlies van drie minuten bij poort oost) en ENG-027 (dag 22, 04:20, firewall-alarm op basis van een inbraakvermoeden). De Historian noemt HIS-053 (dag 22, 04:15, lek bij poort oost, gemeld door de wachters) en spreekt van een fysiek lek. Kunt u uit uw schildregisters vastleggen of er op dag 22 om 04:15 een bres of lek in het schild bij poort oost was, hoe lang die duurde en of u een aanval, inbraak of sabotage kunt bevestigen? Noem de records en tijdstippen. Geef ook aan of het schild op dag 10 tussen 02:40 en 04:50 (ENG-011, HIS-035, HIS-036) enige afwijking vertoonde, zodat we kunnen nagaan of de hulpslag en de schilden samenhangen.",
-      "reden": "ENG-027 is alleen een vermoeden van inbraak en niemand heeft die bevestigd; HIS-053 en ENG-026 beschrijven dezelfde gebeurtenis, maar het fysieke lek bij poort oost valt onder de Guardian Keeper, die nog niet sprak. Zijn schildregisters kunnen bewijzen of ENG-026 een echte bres was of een meetfout, en of het schild op dag 10 meeverandert met de hulpslag.",
+      "aan": "beast_master",
+      "vraag": "Beestenmeester, de Engineer meldt hulpslag ENG-011 (dag 10, 02:40) en pakketverlies ENG-110 (dag 22, 04:15). Hebt u dierlijke onrust in het woud vastgelegd rond die tijdstippen, of eerder? Noem record-ID's en tijdstippen. Ook: was er op dag 10 of dag 22 een duidelijk keerpunt in de onrust?",
+      "reden": "Geen Raadslid heeft nog dierlijke metingen gegeven, en de Beestenmeester merkt een verstoring als eerste; dit toetst of de hulpslag (ENG-011) of de bres (GUA-043) een echt keerpunt was.",
       "open_vragen": [
-        "Wie of wat activeerde de hulpslag (ENG-011) op dag 10 om 02:40? ENG-106 zegt de Engineer zelf, maar dat is een werkboekaantekening van een Rol met eigen belang en is nog niet onafhankelijk bevestigd.",
-        "Welke tijdstempels zijn betrouwbaar? HIS-035 en HIS-036 (dag 10) spreken HIS-103 tegen, en ARC-015 zet de stokking van de Burchtader op dag 14, niet dag 10.",
-        "Is ENG-026 (dag 22, poort oost) een fysiek lek, zoals HIS-053 zegt, of pakketverlies, zoals ENG-026 zegt? Is ENG-107 (dag 10) pakketverlies of een fysiek lek?",
-        "Is er op dag 22 een bewezen aanval of inbraak (ENG-027), of was dat een vermoeden?",
-        "Is de Kroonklok betrokken bij de hulpslag of de Desync? ENG-011 zegt 'los van de Kroonklok'; de klokkenmeester (niet in de Raad) is de aangewezen bron.",
-        "Hoe hangen de signaalmastlamp (ARC-102, ARC-106, dimming op dag 3 volgens ENG-071) en de Desync samen, en is er een oorzaak-gevolgketen van dag 3 tot dag 10?"
+        "Wie activeerde de hulpslag op dag 10 om 02:40 (ENG-011), en op wiens bevel?",
+        "Waarom staat HIS-036 vastgelegd op dag 9 23:55, vóór de klacht van 04:50?",
+        "Wat veroorzaakte de binnenuit-opening van poort oost op dag 22 om 04:15 (GUA-043)?",
+        "Bestaat de 'tweede pols' uit de Kroonklok-akte (HIS-038) echt, en hangt die samen met de hulpslag?",
+        "Hangen de firmwarewijzigingen (ENG-073, ENG-074, ENG-015, ENG-061) samen met het begin van de Desync?"
+      ],
+      "sporen": [
+        {
+          "spoor": "Hulpslag-activatie dag 10 02:40 veroorzaakt de Desync",
+          "door": "engineer",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Hackers achter het pakketverlies op poort oost",
+          "door": "engineer",
+          "status": "dwaalspoor"
+        },
+        {
+          "spoor": "Firmwarewijzigingen poort noord/zuid en voeding dragen bij aan de Desync",
+          "door": "engineer",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Datanet vervuilt de leylijnen",
+          "door": "archmage",
+          "status": "dwaalspoor"
+        },
+        {
+          "spoor": "Datatoren laat het net 'op eigen maat' lopen en houdt dit geheim (ARC-106)",
+          "door": "archmage",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Binnenuit-opening dag 22 04:15 bij poort oost hangt samen met het pakketverlies (GUA-043, ENG-110)",
+          "door": "guardian_keeper",
+          "status": "bevestigd"
+        },
+        {
+          "spoor": "Tweede pols in de Kroonklok brengt het systeem uit de maat (HIS-038)",
+          "door": "historian",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Een oude vloek herhaalt zich (HIS-114)",
+          "door": "historian",
+          "status": "dwaalspoor"
+        }
       ]
     },
     {
       "nr": 21,
       "ronde": 1,
-      "spreker": "guardian_keeper",
+      "spreker": "beast_master",
       "soort": "bericht",
-      "tekst": "**Guardian Keeper**\n\n**Dag 22, 04:15, poort oost:** Volgens GUA-043 ging het schild drie minuten open, van binnenuit, met geen sporen van inbraak van buitenaf. GUA-044 (04:30) meldt intacte zegels aan de buitenzijde en niemand buiten de muur. Er was dus geen bres van buitenaf. Het \"lek\" van HIS-053 en het pakketverlies van ENG-026 staan niet zo in mijn bron. ENG-027 (inbraakvermoeden) strookt niet met GUA-043 en GUA-044. GUA-115 noemt bovendien een melding van de wachters om 01:50, ruim voor de opening. Die tijdstempels wijken af.\n\n**Dag 10, venster 02:40 tot 04:50:** Het enige schildrecord is GUA-019: om 04:47 ging het schild benedenstad twee minuten van binnenuit open, zegels intact, oorzaak niet vastgesteld. Het gaat om een ander schild dan poort oost. ENG-011 (02:40) staat niet in mijn bron.\n\n**Context uit mijn bron:** Volgens GUA-106 lopen er tussen 03:00 en 06:00 geen rondes, zodat elke post alleen waakt. Beide openingen (GUA-019, GUA-043) vielen in dat uur. Volgens GUA-103 slaan de schilden op de pols van de Kroonklok. Hoe die pols op dag 10 liep, staat niet in mijn bron. Dat is een vraag voor de Historian en de Engineer.\n\n**Mijn eigen mening (geen bron):** Ik denk dat iemand van binnen deze openingen bestuurde. Mijn bron bewijst dat niet.\n\nBevestigde ID's: GUA-019, GUA-043, GUA-044, GUA-103, GUA-106, GUA-115.",
+      "tekst": "**Beestenmeester:** Op dag 10 om 02:40 heb ik geen meting. De eerste sterke onrust is om 04:40: de wolven in het diepe woud slaan tegelijk aan (BEA-019, onrust 4). Om 04:50 vluchten de herten van dezelfde plek (BEA-020, onrust 4). Ik kan ENG-011 om 02:40 dus niet bevestigen.\n\nOp dag 22 om 04:15 slaan de wolven weer aan (BEA-046, onrust 4), om 04:20 vluchten de herten (BEA-047). Dat tijdstip klopt met GUA-043, maar mijn dieren zitten in het diepe woud, niet bij poort oost. Ik kan die plek dus niet koppelen.\n\nDag 10 is het keerpunt: daarvoor bereikt de nachtelijke onrust hooguit 2 (BEA-018). Daarna komt elke vierde nacht een piek: dag 14 (BEA-028, BEA-029), dag 18 (BEA-037, BEA-038), dag 26 (BEA-055, BEA-056).\n\nInterpretatie: ik heb de kabels van de toren de oorzaak genoemd (BEA-109, BEA-115). Geen van mijn metingen bewijst dat. De toren en de stalknecht zijn Rollen die de Koning kan bevragen.",
       "bewijs": [
-        "GUA-019",
-        "GUA-043",
-        "GUA-044",
-        "GUA-103",
-        "GUA-106",
-        "GUA-115"
+        "BEA-018",
+        "BEA-019",
+        "BEA-020",
+        "BEA-028",
+        "BEA-029",
+        "BEA-037",
+        "BEA-038",
+        "BEA-046",
+        "BEA-047",
+        "BEA-055",
+        "BEA-056",
+        "BEA-109",
+        "BEA-115"
       ],
       "onbevestigd": []
     },
@@ -265,275 +378,464 @@
       "ronde": 1,
       "spreker": "koning",
       "soort": "routering",
-      "aan": "beast_master",
-      "vraag": "Beast Master, u heeft nog niet gesproken. Het debat heeft de eerste afwijking op verschillende dagen gelegd: ENG-071 en ENG-115 (dag 3, lamp gedimd), ARC-104 (dag 5, Kroonklok gestemd zonder afwijking), ENG-011 en ENG-012 (dag 10, 02:40 en 03:00, hulpslag en +38% doorvoer), ARC-015 (dag 14, stokking Burchtader, volgens Archmage vier dagen later dan HIS-035 beweert) en ENG-026 (dag 22, 04:15, poort oost). Kunt u uit uw waarnemingen van de dieren van het woud vastleggen op welke dag en uur de onrust begon, en of die vóór dag 10 02:40 al zichtbaar was (bijvoorbeeld rond dag 3 of dag 5), of pas erna? Noem de waarnemingen met datum en tijd, en geef aan of de onrust rond dag 10 tussen 02:40 en 04:50 samenvalt met ENG-011, HIS-035 of HIS-036, en of de onrust rond dag 22 04:15 samenvalt met ENG-026 of GUA-043.",
-      "reden": "Beurt 21 (Guardian Keeper) laat zien dat de tijdstempels van dag 22 botsen (HIS-053 en GUA-115 tegenover GUA-043) en dat de Engineer de eerste afwijking niet kan dateren; de Beast Master merkt verstoringen als eerste aan dieren en heeft nog geen bron ingebracht, dus kan de eerste afwijking los van de logs dateren en het tijdstip van ENG-011 toetsen.",
+      "aan": "engineer",
+      "vraag": "Engineer, u zei dat ENG-011 een activatie is die u vastlegde. Beestenmeester meldt geen onrust om 02:40 maar pas om 04:40 (BEA-019), en Historian zet HIS-036 op dag 9 23:55, vóór de klacht van 04:50. Is er een tijdsynchronisatie of klokverschil in het datanet op dag 9 en 10? Toon de logs van ENG-011 en HIS-036 naast elkaar, met de bron van elke tijdstempel.",
+      "reden": "Het spoor 'hulpslag-activatie dag 10 02:40' is ongetoetst en de tijdstempels van ENG-011 en HIS-036 wijken af, wat een klokfout in het net kan zijn.",
       "open_vragen": [
-        "Welke ingreep op dag 10 om 02:40 startte de hulpslag (ENG-011)? ENG-106 is een werkboekaantekening van de Engineer zelf en niet onafhankelijk bevestigd.",
-        "Welke tijdstempels zijn betrouwbaar? HIS-035 en HIS-036 (dag 10) spreken HIS-103 tegen, en ARC-015 zet de stokking van de Burchtader op dag 14.",
-        "Is ENG-026 (dag 22, 04:15, poort oost) een fysiek lek (HIS-053) of pakketverlies (ENG-026)? GUA-043 meldt een opening van binnenuit zonder sporen van buiten; GUA-115 noemt een melding om 01:50.",
-        "Is ENG-027 (dag 22, inbraakalarm) een bewezen aanval? GUA-044 meldt intacte zegels en niemand buiten de muur; de bron is een vermoeden.",
-        "Hoe liep de pols van de Kroonklok op dag 10 (GUA-103, HIS-110), en hoe hangt die pols samen met de hulpslag en de schilden?",
-        "Hoe hangen de signaalmastlamp (ARC-102, ARC-106, ENG-071 dag 3) en de Desync samen, en is er een oorzaak-gevolgketen van dag 3 tot dag 10? De Kroonklok en klokkenmeester zijn geen Rol in de Raad en kunnen niet rechtstreeks bevraagd worden."
+        "Wie activeerde de hulpslag op dag 10 om 02:40 (ENG-011), en op wiens bevel?",
+        "Klopt de tijdstempel van HIS-036 (dag 9 23:55) met het datanet, of is er een klokverschil?",
+        "Wat veroorzaakte de binnenuit-opening van poort oost op dag 22 om 04:15 (GUA-043)?",
+        "Bestaat de 'tweede pols' uit de Kroonklok-akte (HIS-038) echt, en hangt die samen met de hulpslag?",
+        "Hangen de firmwarewijzigingen (ENG-073, ENG-074, ENG-015, ENG-061) samen met het begin van de Desync?",
+        "Hoe verhoudt de viervoudige nachtelijke piek (BEA-028, BEA-037, BEA-055) zich tot de activatie op dag 10?"
+      ],
+      "sporen": [
+        {
+          "spoor": "Hulpslag-activatie dag 10 02:40 veroorzaakt de Desync",
+          "door": "engineer",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Hackers achter het pakketverlies op poort oost",
+          "door": "engineer",
+          "status": "dwaalspoor"
+        },
+        {
+          "spoor": "Firmwarewijzigingen poort noord/zuid en voeding dragen bij aan de Desync",
+          "door": "engineer",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Datanet vervuilt de leylijnen",
+          "door": "archmage",
+          "status": "dwaalspoor"
+        },
+        {
+          "spoor": "Datatoren laat het net 'op eigen maat' lopen en houdt dit geheim (ARC-106)",
+          "door": "archmage",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Binnenuit-opening dag 22 04:15 bij poort oost hangt samen met het pakketverlies (GUA-043, ENG-110)",
+          "door": "guardian_keeper",
+          "status": "bevestigd"
+        },
+        {
+          "spoor": "Tweede pols in de Kroonklok brengt het systeem uit de maat (HIS-038)",
+          "door": "historian",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Een oude vloek herhaalt zich (HIS-114)",
+          "door": "historian",
+          "status": "dwaalspoor"
+        }
       ]
     },
     {
       "nr": 23,
       "ronde": 1,
-      "spreker": "beast_master",
+      "spreker": "engineer",
       "soort": "bericht",
-      "tekst": "**Beast Master**\n\nVóór dag 10 was de onrust zwak en overdag of kort: dag 2 14:55 egel (BEA-004, onrust 1), dag 4 15:50 everzwijn (BEA-008, 1), dag 8 00:20 wolf die één keer huilt (BEA-015, 1), dag 9 13:30 uil (BEA-018, 2). De nachten van dag 4, 5 en 7 waren rustig (BEA-007, BEA-009, BEA-013, allemaal 0).\n\nOp dag 10 kwam de eerste sterke onrust om 04:40: de wolven sloegen aan (BEA-019, onrust 4), en om 04:50 vluchtten de herten (BEA-020, onrust 4). Dat is twee uur na ENG-011 (02:40). Ik zie geen onrust om 02:40 of 03:00. HIS-035 en HIS-036 staan niet in mijn bron, dus ik kan ze niet bevestigen. Mijn tijden liggen wel binnen hun venster.\n\nOp dag 22 begon het opnieuw om 04:15 (BEA-046, wolven, onrust 4) en om 04:20 (BEA-047, herten). ENG-026 en GUA-043 staan niet in mijn bron. Het tijdstip past, maar ik kan de oorzaak niet vaststellen.\n\nVanaf dag 10 kwam het elke vierde nacht terug, met steeds onrust 4 of 5 (BEA-113 in mijn veldnotities; BEA-055 op dag 26, BEA-064 op dag 30). De Oracle noemde de nacht van dag 33 de zwaarste (BEA-118, veldnotities); mijn dieren waren die nacht rustig.\n\nMijn eigen mening, geen bron: het patroon is niet toevallig, maar mijn waarnemingen wijzen niet naar een oorzaak.",
+      "tekst": "**Engineer:** Mijn Kennisbron bevat geen tijdsynchronisatie en geen meting van een klokverschil op dag 9 of 10. Ik kan dus niet bevestigen dat er een klokverschil was.\n\nWat mijn logs vastleggen:\n- **ENG-011**: dag 10, 02:40, hulpslag geactiveerd als eigen pols, los van de Kroonklok (installatielog, tijdveld). Het werkboek noemt hetzelfde tijdstip in ENG-106.\n- **ENG-012**: dag 10, 03:00, doorvoermeting na activatie: +38% (installatielog).\n- **ENG-107**: dag 10, 04:50, klacht uit de benedenstad over \"half aangekomen\" berichten (werkboek). Dit is een klacht, geen meting.\n\nIk kan HIS-036 niet naast ENG-011 zetten: die record staat niet in mijn bron. Ook kan ik BEA-019 niet verifiëren, want ik heb geen onrustmeting. De Historian moet de bron en tijdstempel van HIS-036 toelichten.\n\n**Interpretatie:** Ik vermoed dat de tijdstempels in mijn logs niet door de Kroonklok zijn bepaald, maar dat is mijn eigen aanname en geen meting.",
       "bewijs": [
-        "BEA-004",
-        "BEA-007",
-        "BEA-008",
-        "BEA-009",
-        "BEA-013",
-        "BEA-015",
-        "BEA-018",
-        "BEA-019",
-        "BEA-020",
-        "BEA-046",
-        "BEA-047",
-        "BEA-055",
-        "BEA-064",
-        "BEA-113",
-        "BEA-118"
+        "ENG-011",
+        "ENG-012",
+        "ENG-106",
+        "ENG-107"
       ],
       "onbevestigd": []
     },
     {
       "nr": 24,
-      "ronde": 1,
+      "ronde": 2,
+      "spreker": "koning",
+      "soort": "routering",
+      "aan": "oracle",
+      "vraag": "Oracle, u sprak nog niet. Beestenmeester meldt onrustpieken op dag 14 (BEA-028), dag 18 (BEA-037) en dag 26 (BEA-055), na het keerpunt van dag 10 (BEA-018). Engineer meldt hulpslagactivatie op dag 10 02:40 (ENG-011) en fijnregeling op dag 12 (ENG-061). Lees het patroon: volgt de nachtelijke piek een vaste cyclus vanaf de activatie, of is het ritme onregelmatig? Noem de visioenen of tekens met dag en uur.",
+      "reden": "Het viervoudige piekpatroon (BEA-028, BEA-037, BEA-055) is nog niet getoetst aan de activatie op dag 10 (ENG-011), en de Oracle zoekt het patroon in de tijd.",
+      "open_vragen": [
+        "Wie gaf het bevel tot activatie van de hulpslag op dag 10 02:40 (ENG-011, ENG-106)?",
+        "Klopt de tijdstempel van HIS-036 (dag 9 23:55) met het datanet, of is er een klokverschil?",
+        "Wat veroorzaakte de binnenuit-opening van poort oost op dag 22 04:15 (GUA-043)?",
+        "Bestaat de 'tweede pols' uit de Kroonklok-akte (HIS-038) echt en hangt die samen met de hulpslag?",
+        "Hangen de firmwarewijzigingen (ENG-073, ENG-074, ENG-015) samen met het begin van de Desync?",
+        "Volgt de viervoudige nachtelijke piek (BEA-028, BEA-037, BEA-055) een ritme dat past bij de activatie op dag 10?"
+      ],
+      "sporen": [
+        {
+          "spoor": "Hulpslag-activatie dag 10 02:40 veroorzaakt de Desync",
+          "door": "engineer",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Hackers achter het pakketverlies op poort oost",
+          "door": "engineer",
+          "status": "dwaalspoor"
+        },
+        {
+          "spoor": "Firmwarewijzigingen poort noord/zuid en voeding dragen bij aan de Desync",
+          "door": "engineer",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Datanet vervuilt de leylijnen",
+          "door": "archmage",
+          "status": "dwaalspoor"
+        },
+        {
+          "spoor": "Datatoren laat het net 'op eigen maat' lopen en houdt dit geheim (ARC-106)",
+          "door": "archmage",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Binnenuit-opening dag 22 04:15 bij poort oost hangt samen met het pakketverlies (GUA-043, ENG-110)",
+          "door": "guardian_keeper",
+          "status": "bevestigd"
+        },
+        {
+          "spoor": "Tweede pols in de Kroonklok brengt het systeem uit de maat (HIS-038)",
+          "door": "historian",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Kabels van de datatoren zijn de oorzaak (BEA-109, BEA-115)",
+          "door": "beast_master",
+          "status": "dwaalspoor"
+        }
+      ]
+    },
+    {
+      "nr": 25,
+      "ronde": 2,
+      "spreker": "oracle",
+      "soort": "bericht",
+      "tekst": "**Oracle:** Mijn dagboek toont een vaste cyclus van vier dagen: dag 10, 14, 18, 22, 26, 30, 34, 38 en 42. Telkens werd ik wakker tussen 04:15 en 04:45 (ORA-110, ORA-114, ORA-118, ORA-122, ORA-126, ORA-130, ORA-134, ORA-138, ORA-142). De eerste keer was dag 10 om 04:45 (ORA-110). Mijn bron noemt geen 02:40, dus ik kan ENG-011 niet bevestigen.\n\nVisioenen in die nachten: een lege stad, gebroken spiegel of scherven, stemmen die half aankomen, en stilstaand water (ORA-110, ORA-122, ORA-138).\n\n**Interpretatie:** De conjunctie van de Wachtsterren op dag 33 (ORA-133) als oorzaak (ORA-121). Dat is mijn aanname. De cyclus begon al op dag 10, ruim voor die conjunctie. Geen meting bewijst het.\n\nOver de Beestenmeester: de piek om 04:40 op dag 10 valt dicht bij ORA-110 om 04:45. Mijn bron is een visioen, geen onrustmeting, dus ik kan die koppeling niet hard maken.",
+      "bewijs": [
+        "ORA-110",
+        "ORA-114",
+        "ORA-118",
+        "ORA-121",
+        "ORA-122",
+        "ORA-126",
+        "ORA-130",
+        "ORA-133",
+        "ORA-134",
+        "ORA-138",
+        "ORA-142"
+      ],
+      "onbevestigd": []
+    },
+    {
+      "nr": 26,
+      "ronde": 2,
+      "spreker": "koning",
+      "soort": "routering",
+      "aan": "engineer",
+      "vraag": "Engineer, Oracle meldt een vaste cyclus van vier dagen met nachtelijke piek vanaf dag 10 (ORA-110), en Beestenmeester noemt pieken op dag 14 (BEA-028), dag 18 (BEA-037) en dag 26 (BEA-055). Toon uit uw logs wat er op die dagen na de firmwarewijzigingen ENG-073, ENG-074, ENG-015 en ENG-061 gebeurde, met tijdstippen. Wie gaf volgens het werkboek ENG-106 het bevel tot activatie op dag 10?",
+      "reden": "Het spoor dat de firmwarewijzigingen bijdragen is ongetoetst, en het bevel tot activatie (ENG-106) is nog niet toegeschreven.",
+      "open_vragen": [
+        "Wie gaf het bevel tot activatie van de hulpslag op dag 10 02:40 (ENG-106)?",
+        "Klopt de tijdstempel van HIS-036 (dag 9 23:55) met het datanet, of is er een klokverschil?",
+        "Hangen de firmwarewijzigingen (ENG-073, ENG-074, ENG-015) samen met het begin van de Desync?",
+        "Bestaat de 'tweede pols' uit HIS-038 echt en hangt die samen met de hulpslag?",
+        "Verklaart de hulpslag het 04:40-ritme van de wolven (BEA-019) of het 02:40-tijdstip van ENG-011?"
+      ],
+      "sporen": [
+        {
+          "spoor": "Hulpslag-activatie dag 10 02:40 veroorzaakt de Desync",
+          "door": "engineer",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Hackers achter het pakketverlies op poort oost",
+          "door": "engineer",
+          "status": "dwaalspoor"
+        },
+        {
+          "spoor": "Firmwarewijzigingen poort noord/zuid en voeding dragen bij aan de Desync",
+          "door": "engineer",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Datanet vervuilt de leylijnen",
+          "door": "archmage",
+          "status": "dwaalspoor"
+        },
+        {
+          "spoor": "Datatoren laat het net 'op eigen maat' lopen en houdt dit geheim (ARC-106)",
+          "door": "archmage",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Binnenuit-opening dag 22 04:15 bij poort oost hangt samen met het pakketverlies",
+          "door": "guardian_keeper",
+          "status": "bevestigd"
+        },
+        {
+          "spoor": "Tweede pols in de Kroonklok brengt het systeem uit de maat (HIS-038)",
+          "door": "historian",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Kabels van de datatoren zijn de oorzaak",
+          "door": "beast_master",
+          "status": "dwaalspoor"
+        }
+      ]
+    },
+    {
+      "nr": 27,
+      "ronde": 2,
+      "spreker": "engineer",
+      "soort": "bericht",
+      "tekst": "**Engineer:** Op de gevraagde dagen staat in mijn Kennisbron het volgende:\n\n- **Dag 14:** ENG-081 om 17:15 (kristalrelais, controle) en ENG-082 om 17:30 (back-up, kalibratie).\n- **Dag 18:** ENG-087 om 07:45 (poort zuid, firmware bijgewerkt), ENG-023 om 08:30 (back-up, kalibratie) en ENG-024 om 12:30 (voeding, herstart gepland).\n- **Dag 26:** ENG-032 om 09:45 (poort zuid, schoonmaak).\n\nTwee correcties op de vraag. ENG-073 (dag 4) en ENG-074 (dag 6) betreffen poort noord en poort zuid, en ENG-015 (dag 11) de voeding. ENG-061 (dag 12) is geen firmwarewijziging maar een fijnregeling die daarna is teruggezet. Mijn logs noemen geen onrustmeting op die dagen, dus ik kan de Beestenmeester niet bevestigen of tegenspreken.\n\nOver het bevel: ENG-106 noemt het tijdstip van activatie, maar niet wie het gaf. ENG-105 (dag 9) vermeldt alleen \"goedkeuring van hogerhand\" en het verzoek het niet ruchtbaar te maken. Wie dat was, staat niet in mijn bron.",
+      "bewijs": [
+        "ENG-015",
+        "ENG-023",
+        "ENG-024",
+        "ENG-032",
+        "ENG-061",
+        "ENG-073",
+        "ENG-074",
+        "ENG-081",
+        "ENG-082",
+        "ENG-087",
+        "ENG-105",
+        "ENG-106"
+      ],
+      "onbevestigd": []
+    },
+    {
+      "nr": 28,
+      "ronde": 2,
+      "spreker": "koning",
+      "soort": "routering",
+      "aan": "historian",
+      "vraag": "Historicus, Engineer meldt hulpslag ENG-011 op dag 10 om 02:40, terwijl de nachtwake (HIS-035, 04:45), de Beestenmeester (BEA-019, 04:40), de Oracle (ORA-110, 04:45) en de Guardian Keeper (GUA-019, 04:47) allemaal rond 04:40-04:50 afwijking melden. HIS-036 staat op dag 9 23:55. Bevat de bouwakte HIS-038 een tijdbron of klokinstelling van de Kroonklok, en dateert die van vóór het net? Zo ja, welk klokverschil geeft zij aan?",
+      "reden": "De tijdstempels van ENG-011 (02:40) en HIS-036 (dag 9 23:55) wijken af van de cluster van metingen rond 04:40-04:50, en alleen de Historian kan de bouwakte HIS-038 op een klokverwijzing toetsen.",
+      "open_vragen": [
+        "Wie gaf het bevel tot activatie van de hulpslag op dag 10 (ENG-105 'hogerhand', ENG-106)? Geen Rol in dit debat kent de naam.",
+        "Is het 02:40-tijdstip van ENG-011 een klokverschil van ongeveer twee uur, of een echt eerder tijdstip?",
+        "Bestaat de 'tweede pols' uit HIS-038 echt en hangt die samen met de hulpslag?",
+        "Verklaart de hulpslag het 04:40-ritme van de wolven (BEA-019) en het ritme van de Oracle, of is dat een andere oorzaak?",
+        "Wat is de bron van ARC-106 ('op eigen maat', dag 8), en klopt die met de installatielogs van de datatoren?"
+      ],
+      "sporen": [
+        {
+          "spoor": "Hulpslag-activatie dag 10 02:40 veroorzaakt de Desync",
+          "door": "engineer",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Hackers achter het pakketverlies op poort oost",
+          "door": "engineer",
+          "status": "dwaalspoor"
+        },
+        {
+          "spoor": "Firmwarewijzigingen poort noord/zuid en voeding dragen bij aan de Desync",
+          "door": "engineer",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Datanet vervuilt de leylijnen",
+          "door": "archmage",
+          "status": "dwaalspoor"
+        },
+        {
+          "spoor": "Datatoren laat het net 'op eigen maat' lopen en houdt dit geheim (ARC-106)",
+          "door": "archmage",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Binnenuit-opening dag 22 04:15 bij poort oost hangt samen met het pakketverlies",
+          "door": "guardian_keeper",
+          "status": "bevestigd"
+        },
+        {
+          "spoor": "Tweede pols in de Kroonklok brengt het systeem uit de maat (HIS-038)",
+          "door": "historian",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Kabels van de datatoren zijn de oorzaak",
+          "door": "beast_master",
+          "status": "dwaalspoor"
+        }
+      ]
+    },
+    {
+      "nr": 29,
+      "ronde": 2,
+      "spreker": "historian",
+      "soort": "bericht",
+      "tekst": "**Historian:** Mijn Kennisbron bevat geen tijdbron of klokinstelling in de bouwakte. Het eerste artikel (HIS-109) spreekt over één pols en een tweede pols die \"de maat uitbrengt\", zonder tijd of verschil te noemen. Het tweede artikel (HIS-110) beschrijft hoe een register na een storing hersteld moet worden. De rest van de akte gaat over eikenhout, koper en lonen. De datum van de akte staat niet vermeld; HIS-038 registreert alleen dat ze op dag 11 om 12:55 is teruggevonden.\n\nWel valt op: HIS-036 (dag 10 04:50) is vastgelegd op dag 9 23:55, en HIS-053, HIS-035 en HIS-054 wijken ook af. Volgens HIS-103 hoort vastgelegd_op altijd gelijk te zijn aan gebeurd_op. Dat dit aan klerkenfouten ligt (HIS-112, HIS-116), is mijn interpretatie; er is geen meting die dat draagt.\n\nIk kan de 02:40 van ENG-011 niet bevestigen of weerleggen. Klokinstellingen vraagt u het best aan de Engineer.",
+      "bewijs": [
+        "HIS-035",
+        "HIS-036",
+        "HIS-038",
+        "HIS-053",
+        "HIS-054",
+        "HIS-103",
+        "HIS-109",
+        "HIS-110",
+        "HIS-112",
+        "HIS-116"
+      ],
+      "onbevestigd": []
+    },
+    {
+      "nr": 30,
+      "ronde": 2,
+      "spreker": "koning",
+      "soort": "routering",
+      "aan": "engineer",
+      "vraag": "Engineer, Archmage meldt ARC-106 (dag 8): het net mag 'op eigen maat' lopen en moet geheim blijven. Uw werkboek noemt ENG-105 (dag 9, 'hogerhand') en ENG-106 (dag 10, 02:40). Komt de datum van ARC-106 overeen met de installatielogs van de datatoren? Toon ook of de firmwarewijzigingen ENG-073 (dag 4), ENG-074 (dag 6) of ENG-015 (dag 11) in uw logs gevolgd worden door een gemeten afwijking, en met welk ID.",
+      "reden": "Herbekeken na stopvoorstel: ARC-106 en de firmwarewijzigingen zijn ongetoetste sporen, en alleen uw installatielogs kunnen ze bevestigen of weerleggen.",
+      "open_vragen": [
+        "Wie gaf het bevel tot activatie van de hulpslag op dag 10 (ENG-105 'hogerhand', ENG-106)? Geen Rol in dit debat kent de naam.",
+        "Is het tijdstip 02:40 van ENG-011 een klokfout van de installatielog, of het echte activatiemoment? Alleen BEA-019 (04:40), ORA-110 (04:45), HIS-035 (04:45) en GUA-019 (04:47) melden afwijking.",
+        "Waarom staat de tijdstempel van HIS-036 op dag 9 23:55, vóór de gebeurtenis van dag 10 04:50?",
+        "Bestaat de 'tweede pols' uit HIS-038 echt, en hangt die samen met de hulpslag? Er is geen meting die dat draagt.",
+        "Bron van ARC-106 en de datatoren-installatielog: komen de data overeen?"
+      ],
+      "sporen": [
+        {
+          "spoor": "Hulpslag-activatie dag 10 02:40 veroorzaakt de Desync",
+          "door": "engineer",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Hackers achter het pakketverlies op poort oost",
+          "door": "engineer",
+          "status": "dwaalspoor"
+        },
+        {
+          "spoor": "Firmwarewijzigingen poort noord/zuid en voeding dragen bij aan de Desync",
+          "door": "engineer",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Datanet vervuilt de leylijnen",
+          "door": "archmage",
+          "status": "dwaalspoor"
+        },
+        {
+          "spoor": "Datatoren laat het net 'op eigen maat' lopen en houdt dit geheim (ARC-106)",
+          "door": "archmage",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Binnenuit-opening dag 22 04:15 bij poort oost hangt samen met het pakketverlies",
+          "door": "guardian_keeper",
+          "status": "bevestigd"
+        },
+        {
+          "spoor": "Tweede pols in de Kroonklok brengt het systeem uit de maat (HIS-038)",
+          "door": "historian",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Kabels van de datatoren zijn de oorzaak",
+          "door": "beast_master",
+          "status": "dwaalspoor"
+        }
+      ]
+    },
+    {
+      "nr": 31,
+      "ronde": 2,
+      "spreker": "engineer",
+      "soort": "bericht",
+      "tekst": "**Engineer:** Ik kan ARC-106 niet controleren, want mijn Kennisbron bevat geen ARC-records. Wel heb ik een overeenkomst en een verschil.\n\n- Mijn enige vermelding van geheimhouding is ENG-105 op dag 9: \"goedkeuring verkregen van hogerhand. Niet ruchtbaar maken tot het draait.\" Dat is één dag later dan ARC-106 (dag 8).\n- Op dag 8 staat in de logs alleen ENG-008 (14:10, onderdelen geleverd voor de hulpslag). Die vermeldt geen geheimhouding.\n- ENG-073 (dag 4, poort noord), ENG-074 (dag 6, poort zuid) en ENG-015 (dag 11, voeding): ik vind geen gemeten afwijking die daarop volgt in de logs. De eerste meting na activatie is ENG-012 (dag 10, 03:00, +38% doorvoer). Het klachtenbericht uit de benedenstad (dag 10, 04:50) staat alleen in het werkboek, als ENG-107.\n\nDit is mijn lezing van de bron, geen bewijs van oorzaak.",
+      "bewijs": [
+        "ENG-008",
+        "ENG-012",
+        "ENG-015",
+        "ENG-073",
+        "ENG-074",
+        "ENG-105",
+        "ENG-107"
+      ],
+      "onbevestigd": []
+    },
+    {
+      "nr": 32,
+      "ronde": 2,
       "spreker": "koning",
       "soort": "routering",
       "aan": null,
       "vraag": null,
-      "reden": "Tokenbudget: nog 28940 van 150000 tokens over; een keuze van de Koning (~10384) plus een Raadslid-beurt (~9491) past niet meer naast de reserve van ~14160 voor het Verdict.",
+      "reden": "Beurtenbudget op (10 Raadslid-beurten)",
       "open_vragen": [
-        "Welke ingreep op dag 10 om 02:40 startte de hulpslag (ENG-011)? ENG-106 is een werkboekaantekening van de Engineer zelf en niet onafhankelijk bevestigd.",
-        "Welke tijdstempels zijn betrouwbaar? HIS-035 en HIS-036 (dag 10) spreken HIS-103 tegen, en ARC-015 zet de stokking van de Burchtader op dag 14.",
-        "Is ENG-026 (dag 22, 04:15, poort oost) een fysiek lek (HIS-053) of pakketverlies (ENG-026)? GUA-043 meldt een opening van binnenuit zonder sporen van buiten; GUA-115 noemt een melding om 01:50.",
-        "Is ENG-027 (dag 22, inbraakalarm) een bewezen aanval? GUA-044 meldt intacte zegels en niemand buiten de muur; de bron is een vermoeden.",
-        "Hoe liep de pols van de Kroonklok op dag 10 (GUA-103, HIS-110), en hoe hangt die pols samen met de hulpslag en de schilden?",
-        "Hoe hangen de signaalmastlamp (ARC-102, ARC-106, ENG-071 dag 3) en de Desync samen, en is er een oorzaak-gevolgketen van dag 3 tot dag 10? De Kroonklok en klokkenmeester zijn geen Rol in de Raad en kunnen niet rechtstreeks bevraagd worden."
-      ]
-    },
-    {
-      "nr": 25,
-      "ronde": 2,
-      "spreker": "koning",
-      "soort": "bericht",
-      "tekst": "De Desync begon op dag 10 om 02:40, toen de Engineer zelf de hulpslag in de kelder van de datatoren activeerde als eigen pols voor het datanet (ENG-011, ENG-106). De doorvoer steeg daarna met 38% (ENG-012) en er kwamen berichten half aan (ENG-107), maar een definitief oorzaakverband is niet vastgesteld. Na dag 10 komen verstoringen terug in een ritme van ongeveer elke vier dagen, en dag 34 is de eerstvolgende verwachte dag als niemand ingrijpt.\n\nOorzaak:\n- ingreep: Op dag 10 om 02:40 activeerde de Engineer zelf de hulpslag in de kelder van de datatoren als eigen pols voor het datanet, los van de Kroonklok. (ENG-011, ENG-106)\n- mechanisme: De eigen pols veranderde de belasting van het datanet: de doorvoer steeg om 03:00 met 38% (ENG-012), en om 04:50 meldden klachten half aangekomen berichten (ENG-107). Dat de verliezen aan de hulpslag te wijten zijn, is niet bewezen, omdat ENG-107 geen pakketverlies noemt. (ENG-012, ENG-107)\n- verloop: Na dag 10 komen verstoringen terug op een vast ritme van ongeveer elke vier dagen: dag 10, dag 14 (Burchtader-stokking), dag 22 (poort oost en schild, plus dierenonrust) en dag 26 en dag 30 (dierenonrust). Dag 18 heeft geen record. Waarom dit ritme optreedt, is in het debat niet verklaard. (ENG-012, ARC-015, ENG-026, GUA-043, BEA-046, BEA-055, BEA-064)"
-    }
-  ],
-  "geschillen": [
-    {
-      "onderwerp": "Oorzaak van de afwijking op dag 10 (Kroonklok, hulpslag of magische aantasting)",
-      "standpunten": {
-        "engineer": "Eerst: de hulpslag werd door de Kroonklok aangestuurd. Later herroepen: de hulpslag werd door de Engineer zelf geactiveerd als eigen pols.",
-        "historian": "Geen klokingreep op dag 10 in het archief.",
-        "archmage": "Een magische aantasting van de klok kan het tijdstip verklaren, maar dit is een mening en niet in de bron bewezen.",
-        "beast_master": "Waarnemingen wijzen niet naar een oorzaak."
-      },
-      "uitkomst": "De hulpslag werd door de Engineer zelf geactiveerd (ENG-011, ENG-106). De Kroonklok-bewering is teruggenomen en de Historian bevestigt geen klokingreep. Een magische aantasting heeft geen meetbare steun en wordt niet aangenomen.",
-      "bewijs": [
-        "ENG-011",
-        "ENG-106",
-        "ARC-104"
-      ]
-    },
-    {
-      "onderwerp": "Tijdstip van de Burchtader-stokking",
-      "standpunten": {
-        "historian": "HIS-035 plaatst de stokking op dag 10 om 04:45.",
-        "archmage": "De eerste stokking van de Burchtader is op dag 14 (ARC-015), vier dagen later dan HIS-035 beweert."
-      },
-      "uitkomst": "ARC-015 is een leylijnmeting en weegt zwaarder dan de Historian. Op basis van de records is de eerste meetbare stokking dag 14. De tegenspraak in de tijdstempels (HIS-103) maakt HIS-035 onbetrouwbaar, maar dag 10 is niet volledig uitgesloten.",
-      "bewijs": [
-        "ARC-015",
-        "HIS-035",
-        "HIS-103"
-      ]
-    },
-    {
-      "onderwerp": "Dimming van de signaalmastlamp in de datatoren",
-      "standpunten": {
-        "archmage": "Lamp 's nachts gedimd en het net liep 'op eigen maat' (ARC-102, ARC-106), zonder datum.",
-        "engineer": "Gedimd op dag 3, 15:00, op verzoek per brief (ENG-071, ENG-115)."
-      },
-      "uitkomst": "De dimming is op dag 3 gedateerd (ENG-071, ENG-115) en niet op dag 10 of dag 14. De Archmage heeft geen datum, dus die beschrijving kan niet als bewijs voor dag 10 dienen.",
-      "bewijs": [
-        "ENG-071",
-        "ENG-115",
-        "ARC-102",
-        "ARC-106"
-      ]
-    },
-    {
-      "onderwerp": "Aard van de gebeurtenis bij poort oost op dag 22 (lek, pakketverlies of inbraak)",
-      "standpunten": {
-        "historian": "Een fysiek lek van drie minuten, gemeld door de wachters (HIS-053).",
-        "engineer": "Pakketverlies van drie minuten, status fout (ENG-026), en een firewall-alarm op basis van een inbraakvermoeden (ENG-027).",
-        "guardian_keeper": "Het schild ging van binnenuit open, zonder sporen van inbraak van buitenaf en met intacte zegels (GUA-043, GUA-044)."
-      },
-      "uitkomst": "Er was geen bres van buitenaf (GUA-043, GUA-044), dus het inbraakvermoeden (ENG-027) wordt niet ondersteund. Het pakketverlies (ENG-026) is gelogd. Het 'fysieke lek' van HIS-053 wordt door de Guardian Keeper niet bevestigd, en de tijdstempel GUA-115 wijkt af.",
-      "bewijs": [
-        "GUA-043",
-        "GUA-044",
-        "ENG-026",
-        "ENG-027",
-        "HIS-053",
-        "GUA-115"
-      ]
-    },
-    {
-      "onderwerp": "Of de half aangekomen berichten op dag 10 pakketverlies waren",
-      "standpunten": {
-        "engineer": "ENG-107 noemt half aangekomen berichten, maar het woord pakketverlies staat er niet in. Het is geen bewezen pakketverlies.",
-        "historian": "HIS-036 noemt een klacht over half aangekomen berichten op dag 10, 04:50."
-      },
-      "uitkomst": "Open. Beide bronnen beschrijven klachten, geen meting van pakketverlies. Het verband met de hulpslag blijft een vermoeden.",
-      "bewijs": [
-        "ENG-107",
-        "HIS-036"
-      ]
-    },
-    {
-      "onderwerp": "Ritme van dierenonrust en de nacht van dag 33",
-      "standpunten": {
-        "oracle": "Noemt de nacht van dag 33 de zwaarste.",
-        "beast_master": "Onrust kwam elke vierde nacht terug (dag 10, 14, 22, 26, 30). Op de nacht van dag 33 waren de dieren rustig (BEA-118)."
-      },
-      "uitkomst": "Dag 33 wordt niet aangenomen: de waarnemingen van de Beast Master zijn rustig die nacht en de Oracle heeft geen bevestigde ID's. Het ritme van vier dagen blijft gelden.",
-      "bewijs": [
-        "BEA-118",
-        "BEA-055",
-        "BEA-064"
-      ]
-    },
-    {
-      "nr": 25,
-      "ronde": 2,
-      "spreker": "koning",
-      "soort": "bericht",
-      "tekst": "De Desync lijkt te zijn ontstaan doordat de hulpslag in de datatoren op dag 10 om 02:40 als eigen pols werd geactiveerd, los van de Kroonklok, nadat de Archmage op dag 8 een geheime toestemming had gegeven. Een eigen pols die niet op de Kroonklok loopt, kan volgens de schildregels de timing verstoren, wat past bij het schild benedenstad op dag 10 en de klachten over half aankomende berichten. Het verband met het pakketverlies op poort oost van dag 22 is niet gemeten en blijft een aanname, en de tijdstempels van enkele registers zijn onderling inconsistent.\n\nOorzaak:\n- ingreep: Op dag 8 gaf de Archmage de datatoren toestemming het net 'op eigen maat' te laten lopen en vroeg om geheimhouding. Op dag 9 werd door 'hogerhand' goedkeuring gegeven met de opdracht niet ruchtbaar te maken. Op dag 10 om 02:40 werd de hulpslag in de kelder van de datatoren als eigen pols geactiveerd, los van de Kroonklok. Wie de activering exact uitvoerde, is niet vastgesteld. (ARC-106, ENG-008, ENG-105, ENG-011)\n- mechanisme: Volgens artikel 3 beslist het schild op de tik van de Kroonklok, en verkeer dat tussen twee tikken valt, gaat zonder toets door. Een eigen pols die niet op de Kroonklok loopt, verstoort die timing. De doorvoer steeg na activering met 38% (ENG-012). Op dag 10 ging het schild benedenstad om 04:47 twee minuten van binnenuit open (GUA-019), en om 04:50 klaagde de benedenstad over berichten die half aankwamen (ENG-107). Het register zou volgens HIS-110 op dezelfde manier uit de maat raken. De tijdsvolgorde van 02:40 tot 04:47 is plausibel maar het causale verband is niet direct gemeten. (GUA-104, ENG-012, GUA-019, ENG-107, HIS-110)\n- verloop: De symptomen kwamen niet eenmalig voor. Na dag 10 is het enige gemeten pakketverlies er op dag 22 om 04:15 op poort oost (ENG-026), met het schild poort oost dat drie minuten openging (GUA-043, GUA-044). De Beast Master zag onrust bij de diepe woud-plekken op dag 10 rond 04:40 tot 04:50 (BEA-019, BEA-020) en op dag 22 rond 04:15 tot 04:20 (BEA-046, BEA-047). Volgens de Beast Master kwam de onrust daartussen elke vierde nacht terug (BEA-113, met BEA-028, BEA-029, BEA-037, BEA-038, BEA-055, BEA-056, BEA-064, BEA-065, BEA-073, BEA-074, BEA-082, BEA-083, BEA-091, BEA-092). Dat patroon komt alleen uit de logboek van de Beast Master. De Engineer en de Guardian Keeper hebben geen records na dag 22, dus het patroon is niet door een tweede bron bevestigd. (ENG-026, GUA-043, GUA-044, BEA-019, BEA-020, BEA-046, BEA-047, BEA-113)"
-    }
-  ],
-  "geschillen": [
-    {
-      "onderwerp": "Oorzaak van de Desync: eigen pols of infiltratie/hackers",
-      "standpunten": {
-        "engineer": "De hulpslag van dag 10 is de vastgestelde afwijking. Een verband met het pakketverlies van dag 22 is een vermoeden en niet bewezen. Hackers zijn een interpretatie.",
-        "guardian_keeper": "Een infiltrant is waarschijnlijk, maar niet bewezen. De schilden zijn van binnenuit geopend en de buitenzijde toont geen inbraak.",
-        "historian": "De eigen pols past bij het register-probleem (HIS-110), en de tijdlijn van de hackers-melding is inconsistent.",
-        "beast_master": "Onrust rond de datatoren op dag 10 en dag 22, maar de oorzaak is niet bepaald."
-      },
-      "uitkomst": "De eigen pols van dag 10 is de best onderbouwde ingreep, met een meetbare activering (ENG-011) en een plausibele timing naar GUA-019. De infiltrant-hypothese blijft niet bewezen. GUA-115 is een inconsistent register en mag niet als sluitend bewijs gelden.",
-      "bewijs": [
-        "ENG-011",
-        "ENG-012",
-        "GUA-019",
-        "GUA-104",
-        "HIS-110",
-        "GUA-116",
-        "GUA-115"
-      ]
-    },
-    {
-      "onderwerp": "Rol van de leylijnen",
-      "standpunten": {
-        "archmage": "Het datanet verstoort de magie, maar dat is een overtuiging en geen meting. De leylijnen waren op dag 14 laag, en de daling begon niet op een bepaalde dag.",
-        "historian": "Een tweede pols naast de Kroonklok brengt het register uit de maat (HIS-110). Dat wordt door de Archmage niet bevestigd.",
-        "engineer": "Er ontbreekt een meting van de leylijnen op dag 10 en dag 22."
-      },
-      "uitkomst": "Open. Er is geen meting die de leylijnen aan de eigen pols koppelt. De Archmage's oordeel dat het net de magie verstoort, is een interpretatie. HIS-110 staat niet in de bron van de Archmage en kan dus niet door hem worden bevestigd.",
-      "bewijs": [
-        "ARC-015",
-        "ARC-106",
-        "ARC-109",
-        "HIS-110"
-      ]
-    },
-    {
-      "onderwerp": "Wie gaf de opdracht voor de afwijkende maat en wanneer",
-      "standpunten": {
-        "archmage": "Op dag 8 heeft hij toestemming gegeven om het net op eigen maat te laten lopen en heeft hij om geheimhouding gevraagd.",
-        "engineer": "Er is geen record op dag 8 die de opdracht vastlegt. Op dag 9 staat alleen 'goedkeuring van hogerhand, niet ruchtbaar maken' zonder naam.",
-        "beast_master": "Mannen van de toren werkten op dag 3 aan de kabels bij de oude eik, en op dag 27 liggen die kabels er nog. Wat ze met de datatoren te maken hebben, is niet vastgesteld."
-      },
-      "uitkomst": "De Archmage heeft zijn toestemming van dag 8 toegegeven, wat tegen zijn eigen Belang ingaat en daarom geloofwaardig is. Wie de hogerhand is en wie de hulpslag exact activeerde, blijft open. De kabels van dag 3 zijn geen bewijs voor de instelling.",
-      "bewijs": [
-        "ARC-106",
-        "ENG-008",
-        "ENG-105",
-        "BEA-102",
-        "BEA-115"
-      ]
-    },
-    {
-      "onderwerp": "Tijdstempels en volgorde van de registers",
-      "standpunten": {
-        "historian": "HIS-053 is vastgelegd op dag 22 om 01:50 en gebeurd op 04:15, en HIS-036 op dag 9 om 23:55 voor dag 10 om 04:50. Dat is in strijd met HIS-103. Mogelijk een klerkenfout of een probleem met de pols.",
-        "guardian_keeper": "De melding van de 'hackers' staat om 01:50 ingeschreven, meer dan twee uur voor de opening van poort oost.",
-        "engineer": "Het pakketverlies van 3 minuten op poort oost is gemeten op dag 22 om 04:15 (ENG-026)."
-      },
-      "uitkomst": "Het meetbare tijdstip van de gebeurtenis (dag 22, 04:15, ENG-026 en GUA-043) wordt aanvaard. De vastlegging van 01:50 is niet betrouwbaar en wordt niet als bewijs van hackers gebruikt. De oorzaak van de inconsistentie blijft onbekend.",
-      "bewijs": [
-        "HIS-053",
-        "HIS-036",
-        "HIS-103",
-        "GUA-115",
-        "ENG-026",
-        "GUA-043"
-      ]
-    },
-    {
-      "onderwerp": "Terugkeer van de verstoring na dag 22",
-      "standpunten": {
-        "beast_master": "Onrust keert elke vierde nacht terug van dag 10 tot en met dag 42 (BEA-113).",
-        "engineer": "Geen logs na dag 22 en de fijnregeling is op dag 12 teruggezet (ENG-061, ENG-114). Versterking van dag 24 volgt na het pakketverlies (ENG-029, ENG-062).",
-        "guardian_keeper": "Alleen meldingen op dag 10 en dag 22."
-      },
-      "uitkomst": "Open. Het terugkeerpatroon komt alleen uit de logboek van de Beast Master. Onrust van dieren is geen gemeten Desync, en de Engineer en Guardian Keeper hebben geen records die het patroon bevestigen.",
-      "bewijs": [
-        "BEA-113",
-        "ENG-061",
-        "ENG-114",
-        "ENG-029",
-        "ENG-062",
-        "GUA-019",
-        "GUA-043"
+        "Wie gaf het bevel tot activatie van de hulpslag op dag 10 (ENG-105 'hogerhand', ENG-106)? Geen Rol in dit debat kent de naam.",
+        "Is het tijdstip 02:40 van ENG-011 een klokfout van de installatielog, of het echte activatiemoment? Alleen BEA-019 (04:40), ORA-110 (04:45), HIS-035 (04:45) en GUA-019 (04:47) melden afwijking.",
+        "Waarom staat de tijdstempel van HIS-036 op dag 9 23:55, vóór de gebeurtenis van dag 10 04:50?",
+        "Bestaat de 'tweede pols' uit HIS-038 echt, en hangt die samen met de hulpslag? Er is geen meting die dat draagt.",
+        "Bron van ARC-106 en de datatoren-installatielog: komen de data overeen?"
+      ],
+      "sporen": [
+        {
+          "spoor": "Hulpslag-activatie dag 10 02:40 veroorzaakt de Desync",
+          "door": "engineer",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Hackers achter het pakketverlies op poort oost",
+          "door": "engineer",
+          "status": "dwaalspoor"
+        },
+        {
+          "spoor": "Firmwarewijzigingen poort noord/zuid en voeding dragen bij aan de Desync",
+          "door": "engineer",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Datanet vervuilt de leylijnen",
+          "door": "archmage",
+          "status": "dwaalspoor"
+        },
+        {
+          "spoor": "Datatoren laat het net 'op eigen maat' lopen en houdt dit geheim (ARC-106)",
+          "door": "archmage",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Binnenuit-opening dag 22 04:15 bij poort oost hangt samen met het pakketverlies",
+          "door": "guardian_keeper",
+          "status": "bevestigd"
+        },
+        {
+          "spoor": "Tweede pols in de Kroonklok brengt het systeem uit de maat (HIS-038)",
+          "door": "historian",
+          "status": "ongetoetst"
+        },
+        {
+          "spoor": "Kabels van de datatoren zijn de oorzaak",
+          "door": "beast_master",
+          "status": "dwaalspoor"
+        }
       ]
     }
   ],
+  "geschillen": [],
   "verbruik": {
-    "groot": {
-      "beurten": 7,
-<<<<<<< HEAD
-      "invoer": 35479,
+    "koning-routering": {
+      "beurten": 11,
+      "invoer": 71201,
       "gecached": 0,
-      "uitvoer": 20146
-=======
-      "invoer": 35439,
-      "gecached": 0,
-      "uitvoer": 19000
->>>>>>> 39dd04c (FinaleVersie1)
+      "uitvoer": 20279
     },
-    "klein": {
-      "beurten": 6,
-      "invoer": 69578,
+    "raadsleden": {
+      "beurten": 10,
+      "invoer": 100226,
       "gecached": 0,
-      "uitvoer": 15059
+      "uitvoer": 16878
     }
   },
-  "aan_het_woord": null,
+  "aan_het_woord": "koning",
   "tokens": {
-    "budget": 150000,
-<<<<<<< HEAD
-    "gebruikt": 137700
-=======
-    "gebruikt": 139076
->>>>>>> 39dd04c (FinaleVersie1)
+    "budget": 260000,
+    "gebruikt": 208584
   }
 }

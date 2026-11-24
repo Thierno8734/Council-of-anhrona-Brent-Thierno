@@ -21,11 +21,11 @@ KENNISBRONNEN = ROOT / "kennisbronnen"
 ROLLEN = ("archmage", "engineer", "guardian_keeper", "historian", "oracle", "beast_master")
 PREFIX = {"archmage": "ARC", "engineer": "ENG", "guardian_keeper": "GUA", "historian": "HIS", "oracle": "ORA", "beast_master": "BEA"}
 BEURTENBUDGET = 10
-LID_LAATSTE = 6
+LID_LAATSTE = 2
 TEKENS_PER_TOKEN = 3.2
 SLOTS = ("ingreep", "mechanisme", "verloop")
 BEZET_TOT = {"MODEL_KLEIN": 0.0, "MODEL_GROOT": 0.0}
-MAX_WOORDEN = 300
+MAX_WOORDEN = 220
 ID_RE = re.compile(r"\b(ARC|ENG|GUA|HIS|ORA|BEA)\s?[-‐‑‒–—―−]\s?([0-9]{3})\b")
 
 
@@ -55,22 +55,31 @@ Zo kies je goed:
 9. Verwijst een Raadslid naar een andere Rol? Overweeg die Rol als volgende.
 10. Een vraag aan een Raadslid dat nog niet sprak, sluit aan bij wat al gezegd is: noem de beurt of het ID waarop het moet reageren.
 
+Dwaalsporen: in dit debat zitten verklaringen die niet kloppen. Een Kennisbron bevat feiten (metingen, logs, registraties) maar ook conclusies, vermoedens, overtuigingen en voorspellingen van de schrijver zelf, en die kunnen fout zijn.
+11. Houd een lijst "sporen" bij: elke verklaring voor de Desync die een Raadslid naar voren schuift. Status: "ongetoetst", "bevestigd" (een meting van een andere Rol steunt ze) of "dwaalspoor" (metingen spreken ze tegen, of ze steunt alleen op een vermoeden, voorteken of overtuiging).
+12. Toets elk ongetoetst spoor bij de Rol wiens metingen het kunnen bevestigen of weerleggen: vraag naar concrete tijdstippen, plaatsen en records die erop wijzen of ertegen ingaan. Twee bronnen die op hetzelfde tijdstip of dezelfde plaats uitkomen zijn sterk bewijs; een spoor waarvoor geen enkele meting bestaat, is verdacht.
+13. Laat een Raadslid zijn eigen verklaring verdedigen tegenover het bewijs van een ander als die elkaar tegenspreken.
+14. Een bron bevat soms ook beschrijvingen van hoe iets werkt: een specificatie, reglement, ontwerp of akte. Dat is geen vermoeden en geen dwaalspoor, maar een gegeven over het ontwerp. Toets of de gemeten tijdstippen en plaatsen ermee kloppen: daar vind je vaak het mechanisme.
+15. Verspil geen beurten: vraag een Raadslid niet opnieuw naar iets waarop het al antwoordde dat zijn bron er niets over zegt, en geef dezelfde Rol niet twee beurten na elkaar over hetzelfde punt. Een ongetoetst spoor gaat voor een vraag die al beantwoord is.
+
 Stop het debat (rol null) pas als de drie delen van de oorzaak één samenhangende keten vormen, gestaafd met bevestigde ID's, en elke tegenspraak beslecht is. Heb je nog beurten en open vragen of open tegenspraak, gebruik ze. Stoppen vóór het budget op is, is een goede keuze als je echt genoeg weet.
 
 Antwoord met alleen één JSON-object:
-{{"rol": "<een rol-id uit de lijst, of null om te stoppen>", "vraag": "<de vraag aan dat Raadslid, of null>", "reden": "<1-2 concrete zinnen: welke beurt of welk ID aanleiding geeft en welk deel van de oorzaak dit invult>", "open_vragen": ["<korte open vraag>", "..."]}}
-open_vragen: wat na deze keuze nog onbeantwoord is (hoogstens 6). Haal weg wat beantwoord is."""
+{{"rol": "<een rol-id uit de lijst, of null om te stoppen>", "vraag": "<de vraag aan dat Raadslid, hoogstens 60 woorden, met de dagen, plaatsen en ID's van anderen waarop het moet reageren; of null>", "reden": "<één concrete zin: welke beurt of welk ID aanleiding geeft en welk deel van de oorzaak of welk spoor dit toetst>", "open_vragen": ["<korte open vraag>", "..."], "sporen": [{{"spoor": "<de verklaring in een paar woorden>", "door": "<rol-id die ze aanbracht>", "status": "ongetoetst|bevestigd|dwaalspoor"}}]}}
+open_vragen: wat na deze keuze nog onbeantwoord is (hoogstens 6). Haal weg wat beantwoord is.
+sporen: je volledige, bijgewerkte lijst (hoogstens 8)."""
 
 
 KONING_STOP = """Je wilde het debat stoppen. Kijk nog één keer kritisch:
 {punten}
+Zijn er sporen die nog "ongetoetst" zijn? Toets ze eerst, als er beurten over zijn.
 Beslis opnieuw. Spraken er Raadsleden nog niet, kies er dan één en stel een gerichte vraag die aansluit bij het debat (noem de beurt of het ID waarop het moet reageren).
 Anders: kies wie een open vraag of tegenspraak kan beslechten, of bevestig dat je stopt met een concrete reden.
 Antwoord met hetzelfde JSON-object als daarnet."""
 
 
 INKORTEN = """Hieronder staat het antwoord van een Raadslid, maar er staat ook zijn denkproces in.
-Geef alleen het eindantwoord dat het Raadslid aan de Council geeft, in hoogstens 180 woorden, in de ik-vorm.
+Geef alleen het eindantwoord dat het Raadslid aan de Council geeft, in hoogstens 130 woorden, in de ik-vorm.
 Schrijf in het Nederlands. Neem record-ID's letterlijk over. Voeg niets toe wat er niet staat. Geen inleiding, geen uitleg over wat je doet."""
 
 
@@ -84,6 +93,9 @@ Regels:
 - Kies één samenhangende oorzaakketen: de ingreep veroorzaakt het mechanisme, en het mechanisme verklaart het verloop. Geen opsomming van alle theorieën.
 - Meetbare records (logs, metingen, rapporten, registers) wegen zwaarder dan interpretaties, overtuigingen en visioenen. Een verklaring die precies het Belang van de spreker dient, is verdacht tot een andere bron ze bevestigt.
 - Verzin geen mechanisme of feit dat niet in het debat staat.
+- Een beschrijving van hoe iets werkt (specificatie, reglement, ontwerp, akte) is geen dwaalspoor omdat ze geen meting is. Ze is alleen een dwaalspoor als metingen ze tegenspreken. Verklaart ze hoe de ingreep tot de gemeten symptomen leidt, gebruik ze dan in het mechanisme.
+- Controleer op het einde: een spoor of record dat je in de oorzaak gebruikt, mag niet tegelijk een dwaalspoor zijn. Spreken oorzaak en dwaalsporen elkaar tegen, kies dan op basis van de metingen.
+- Dwaalsporen: in het debat zitten verklaringen die niet kloppen (conclusies, vermoedens, overtuigingen of voorspellingen van een Raadslid of de schrijver van een bron, die niet door metingen gedragen worden of door metingen van een andere Rol tegengesproken worden). Benoem ze expliciet in "dwaalsporen", met welke Rol ze aanbracht, waarom ze niet kloppen en welke bevestigde ID's dat aantonen. Een dwaalspoor hoort niet in de oorzaak. Noem de belangrijkste dwaalsporen ook kort in de samenvatting.
 - Noem ID's altijd apart, nooit als bereik.
 - Weet je een deel van de oorzaak niet zeker genoeg? Zet "bewering" op null en "bewijs" op [].
 - zekerheid: jouw eerlijke inschatting tussen 0 en 1 per deel van de oorzaak.
@@ -104,7 +116,8 @@ Antwoord met alleen één JSON-object in deze vorm:
   "acties": [{"actie": "...", "reden": "...", "bewijs": ["ID"]}],
   "risicos": [{"risico": "...", "mitigatie": "..."}],
   "voorspelling": {"dag": 0, "bewering": "...", "bewijs": ["ID"]},
-  "geschillen": [{"onderwerp": "...", "standpunten": {"<rol-id>": "..."}, "uitkomst": "...", "bewijs": ["ID"]}]
+  "geschillen": [{"onderwerp": "...", "standpunten": {"<rol-id>": "..."}, "uitkomst": "...", "bewijs": ["ID"]}],
+  "dwaalsporen": [{"bewering": "<de verklaring die niet klopt>", "door": "<rol-id>", "waarom": "<waarom ze niet klopt>", "bewijs": ["ID"]}]
 }"""
 
 
@@ -215,7 +228,10 @@ def instructies(lid, bestanden, mcp, leden):
         "- Strookt iets wat een ander Raadslid zei niet met jouw Kennisbron? Zeg dat expliciet, met jouw ID's.\n"
         "- Verwijst je Kennisbron naar een andere Rol, persoon of plaats? Meld dat, zodat de Koning die Rol kan bevragen.\n"
         "- Je hebt een Belang en kan ernaast zitten: scheid wat je bron vaststelt van wat jij erover denkt.\n"
-        "- Weet je iets niet, zeg dat eerlijk. Herhaal niet wat al gezegd is. Hoogstens 180 woorden.\n"
+        "- Je Kennisbron bevat feiten (metingen, logs, registraties met tijdstip) en conclusies, vermoedens of overtuigingen van de schrijver. "
+        "Noem een conclusie altijd 'interpretatie' en zeg of er een meting is die ze draagt. Een interpretatie die precies jouw Belang dient, kan een dwaalspoor zijn.\n"
+        "- Vraagt de Koning je een verklaring van een ander te toetsen: zeg expliciet of jouw metingen ze bevestigen, tegenspreken of er niets over zeggen, met tijdstippen en ID's.\n"
+        "- Weet je iets niet, zeg dat eerlijk. Herhaal niet wat al gezegd is en herhaal de vraag niet. Hoogstens 130 woorden, kort en feitelijk.\n"
         "- Schrijf alleen je eindantwoord aan de Council: geen denkproces, geen plan, geen opsomming van wat je gaat opzoeken.\n"
         "- Antwoord altijd in het Nederlands."
     )
@@ -288,16 +304,22 @@ def toolresultaten(response):
     return "\n".join(delen)
 
 
-def koning_model():
-    env = "MODEL_GROOT"
-    if is_bezet(env) and ander_model(env) and not is_bezet(ander_model(env)):
-        env = ander_model(env)
-    niveau = denkniveau("REASONING_KONING" if env == "MODEL_GROOT" else "REASONING")
+def koning_model(soort):
+    if soort == "verdict":
+        env, niv = "MODEL_GROOT", "REASONING_KONING"
+    else:
+        env = "MODEL_ROUTERING" if os.getenv("MODEL_ROUTERING", "").strip() else "MODEL_KLEIN"
+        niv = "REASONING_ROUTERING" if os.getenv("REASONING_ROUTERING", "").strip() else "REASONING"
+    if is_bezet(env):
+        alt = ander_model(env)
+        if alt and not is_bezet(alt):
+            env, niv = alt, ("REASONING_KONING" if alt == "MODEL_GROOT" else "REASONING")
+    niveau = denkniveau(niv)
     return env, {"reasoning_effort": niveau} if niveau else {}
 
 
-async def vraag_json(llm, systeem, gebruiker, verbruik, pogingen=3):
-    env, extra = koning_model()
+async def vraag_json(llm, systeem, gebruiker, verbruik, pogingen=3, soort="routering"):
+    env, extra = koning_model(soort)
     berichten = [{"role": "system", "content": systeem}, {"role": "user", "content": gebruiker}]
     fout, poging, wachten = None, 0, 0
     while poging < pogingen:
@@ -310,7 +332,7 @@ async def vraag_json(llm, systeem, gebruiker, verbruik, pogingen=3):
             fout = e
             if limiet_wachttijd(e):
                 markeer_bezet(env, e)
-                nieuw_env, nieuw_extra = koning_model()
+                nieuw_env, nieuw_extra = koning_model(soort)
                 if nieuw_env != env and not is_bezet(nieuw_env):
                     print(f"LET OP: {env}={os.environ[env]!r} zit vol; de Koning wijkt uit naar {nieuw_env}={os.environ[nieuw_env]!r}.")
                     env, extra = nieuw_env, nieuw_extra
@@ -326,7 +348,7 @@ async def vraag_json(llm, systeem, gebruiker, verbruik, pogingen=3):
             poging += 1
             await asyncio.sleep(2)
             continue
-        tel_openai(verbruik, "groot", r.usage)
+        tel_openai(verbruik, "koning-verdict" if soort == "verdict" else "koning-routering", r.usage)
         tekst = r.choices[0].message.content or ""
         data = lees_json(tekst)
         if isinstance(data, dict):
@@ -352,7 +374,7 @@ async def kort_in(llm, tekst, verbruik):
         return None
     if isinstance(r, str) or not getattr(r, "choices", None):
         return None
-    tel_openai(verbruik, "klein", r.usage)
+    tel_openai(verbruik, "raadsleden", r.usage)
     kort = normaliseer_ids(re.sub(r"<think>.*?</think>", "", r.choices[0].message.content or "", flags=re.S)).strip()
     if not kort or len(kort.split()) >= len(tekst.split()):
         return None
@@ -364,9 +386,9 @@ async def kort_in(llm, tekst, verbruik):
 
 def tokenbudget():
     try:
-        return max(10000, int(os.getenv("TOKENBUDGET", "150000")))
+        return max(10000, int(os.getenv("TOKENBUDGET", "200000")))
     except ValueError:
-        return 150000
+        return 200000
 
 
 def tokens_geschat(tekst):
@@ -380,29 +402,35 @@ def gebruikt(verbruik):
 def debat_voor_lid(beurten, namen):
     berichten = raadsleden_berichten(beurten)
     if len(berichten) <= LID_LAATSTE:
-        return debat_tekst(beurten, namen)
+        return debat_tekst(beurten, namen, voor_lid=True)
     grens = berichten[-LID_LAATSTE]["nr"]
     ervoor = [b["nr"] for b in beurten if b["soort"] == "routering" and b["nr"] < grens]
     vanaf = ervoor[-1] if ervoor else grens
     weg = len(berichten) - LID_LAATSTE
     return (f"({weg} eerdere beurten weggelaten; de Koning zet in zijn vraag wat je ervan nodig hebt.)\n\n"
-            + debat_tekst([b for b in beurten if b["nr"] >= vanaf], namen))
+            + debat_tekst([b for b in beurten if b["nr"] >= vanaf], namen, voor_lid=True))
 
 
 def raadsleden_berichten(beurten):
     return [b for b in beurten if b["soort"] == "bericht" and b["spreker"] in ROLLEN]
 
 
-def debat_tekst(beurten, namen):
+def debat_tekst(beurten, namen, voor_lid=False, kort_oud=False):
     regels = []
+    routeringen = [b["nr"] for b in beurten if b["soort"] == "routering" and b.get("aan")]
+    recent = set(routeringen[-2:])
     for b in beurten:
         if b["soort"] == "routering" and b.get("aan"):
-            regels.append(f"[beurt {b['nr']}] Koning → {namen.get(b['aan'], b['aan'])}: {b.get('vraag')}")
+            vraag = b.get("vraag") or ""
+            if kort_oud and b["nr"] not in recent:
+                woorden = vraag.split()
+                vraag = " ".join(woorden[:22]) + (" …" if len(woorden) > 22 else "")
+            regels.append(f"[beurt {b['nr']}] Koning → {namen.get(b['aan'], b['aan'])}: {vraag}")
         elif b["soort"] == "bericht" and b["spreker"] in ROLLEN:
-            controle = f"bevestigde ID's: {', '.join(b.get('bewijs') or []) or 'geen'}"
-            if b.get("onbevestigd"):
-                controle += f"; NIET bevestigd (niet in de eigen Kennisbron gevonden): {', '.join(b['onbevestigd'])}"
-            regels.append(f"[beurt {b['nr']}] {namen.get(b['spreker'], b['spreker'])} ({b['spreker']}): {b['tekst']}\n   ({controle})")
+            regel = f"[beurt {b['nr']}] {namen.get(b['spreker'], b['spreker'])} ({b['spreker']}): {b['tekst']}"
+            if b.get("onbevestigd") and not voor_lid:
+                regel += f"\n   (NIET bevestigd, niet in de eigen Kennisbron gevonden: {', '.join(b['onbevestigd'])})"
+            regels.append(regel)
     return "\n\n".join(regels) or "(nog niets gezegd)"
 
 
@@ -424,7 +452,26 @@ def regel_keuze(beurten, leden, waarom):
     return None, None, f"regel ({waarom}): iedereen sprak en niemand werd nog genoemd"
 
 
-async def kies_volgende(beurten, leden, llm, verbruik, open_vragen, budget_tekst="", mag_herbekijken=True):
+def lees_sporen(data, rollen):
+    uit = []
+    for sp in data.get("sporen") or []:
+        if not isinstance(sp, dict) or not str(sp.get("spoor") or "").strip():
+            continue
+        status = str(sp.get("status") or "ongetoetst").strip().lower()
+        status = status if status in ("ongetoetst", "bevestigd", "dwaalspoor") else "ongetoetst"
+        door = str(sp.get("door") or "").strip().lower().replace(" ", "_")
+        uit.append({"spoor": normaliseer_ids(str(sp["spoor"]).strip())[:160], "door": door if door in rollen else None, "status": status})
+    return uit[:8]
+
+
+def sporen_tekst(sporen, namen):
+    if not sporen:
+        return "(nog geen)"
+    return "\n".join(f"- [{s['status']}] {s['spoor']} (aangebracht door {namen.get(s['door'], 'onbekend')})" for s in sporen)
+
+
+async def kies_volgende(beurten, leden, llm, verbruik, open_vragen, budget_tekst="", mag_herbekijken=True, sporen=None):
+    sporen = sporen if sporen is not None else []
     if os.getenv("KONING", "agent").lower() == "regels":
         rol, vraag, reden = regel_keuze(beurten, leden, "Koning in regelmodus")
         return rol, vraag, reden, open_vragen
@@ -439,7 +486,8 @@ async def kies_volgende(beurten, leden, llm, verbruik, open_vragen, budget_tekst
         f"Nog {over} van de {BEURTENBUDGET} Raadslid-beurten over.\n"
         + (f"{budget_tekst}\n" if budget_tekst else "") + "\n"
         f"Jouw open vragen tot nu toe:\n" + ("\n".join(f"- {v}" for v in open_vragen) or "(nog geen)") +
-        f"\n\nDebat tot nu toe:\n\n{debat_tekst(beurten, namen)}\n\n"
+        f"\n\nJouw sporen tot nu toe:\n{sporen_tekst(sporen, namen)}" +
+        f"\n\nDebat tot nu toe (oudere vragen van jou ingekort):\n\n{debat_tekst(beurten, namen, kort_oud=True)}\n\n"
         "Wie spreekt nu, met welke vraag en waarom? Of stop je het debat?"
     )
     try:
@@ -450,6 +498,9 @@ async def kies_volgende(beurten, leden, llm, verbruik, open_vragen, budget_tekst
         return rol, vraag, reden, open_vragen
 
     rol, vraag, reden, nieuwe_open, geldig = ontleed(data, namen, leden)
+    nieuwe_sporen = lees_sporen(data, namen)
+    if nieuwe_sporen:
+        sporen[:] = nieuwe_sporen
     if not geldig:
         r, v, rd = regel_keuze(beurten, leden, f"Koning koos onbekende Rol {data.get('rol')!r}")
         return r, v, rd, nieuwe_open or open_vragen
@@ -463,13 +514,19 @@ async def kies_volgende(beurten, leden, llm, verbruik, open_vragen, budget_tekst
                           + ". Hun Kennisbron kan net het ontbrekende stuk of het tegenbewijs bevatten.")
         if nieuwe_open:
             punten.append("- Je eigen open vragen: " + "; ".join(nieuwe_open))
-        if (stil or nieuwe_open) and mag_herbekijken:
+        ongetoetst = [s["spoor"] for s in sporen if s["status"] == "ongetoetst"]
+        if ongetoetst:
+            punten.append("- Nog niet getoetste sporen: " + "; ".join(ongetoetst))
+        if (stil or nieuwe_open or ongetoetst) and mag_herbekijken:
             punten.append(f"- Er zijn nog {over} Raadslid-beurten over.")
             herzien = (gebruiker + f"\n\nJe eerste beslissing: {json.dumps(data, ensure_ascii=False)}\n\n"
                        + KONING_STOP.format(punten="\n".join(punten)))
             try:
                 data2 = await vraag_json(llm, KONING_ROUTERING.format(budget=BEURTENBUDGET, laatste=LID_LAATSTE), herzien, verbruik)
                 rol2, vraag2, reden2, open2, geldig2 = ontleed(data2, namen, leden)
+                sporen2 = lees_sporen(data2, namen)
+                if sporen2:
+                    sporen[:] = sporen2
             except Exception as e:
                 print(f"LET OP: de Koning kon zijn stopbeslissing niet herbekijken ({e}).")
                 rol2, geldig2 = None, False
@@ -585,6 +642,16 @@ def maak_verdict(data, run_id, toegestaan, rollen):
         if uitkomst and not bewijs:
             uitkomst = None
         geschillen.append({"onderwerp": str(g["onderwerp"]).strip(), "standpunten": standpunten, "uitkomst": uitkomst, "bewijs": bewijs})
+    dwaal = []
+    for d in data.get("dwaalsporen") or []:
+        if not isinstance(d, dict) or not str(d.get("bewering") or "").strip():
+            continue
+        door = str(d.get("door") or "").strip().lower().replace(" ", "_")
+        item = {"bewering": normaliseer_ids(str(d["bewering"])).strip(), "door": door if door in rollen else None,
+                "waarom": normaliseer_ids(str(d.get("waarom") or "")).strip() or None, "bewijs": schoon_bewijs(d.get("bewijs"), toegestaan)}
+        dwaal.append(item)
+    if dwaal:
+        verdict["dwaalsporen"] = dwaal[:8]
     return verdict, geschillen
 
 
@@ -631,7 +698,7 @@ async def test_verbinding():
     url = os.environ["OPENAI_BASE_URL"]
     lokaal = "localhost" in url or "127.0.0.1" in url
     llm = async_llm().with_options(max_retries=1, timeout=90)
-    for env in ("MODEL_KLEIN", "MODEL_GROOT"):
+    for env in [e for e in ("MODEL_KLEIN", "MODEL_GROOT", "MODEL_ROUTERING") if os.getenv(e, "").strip()]:
         model = os.environ[env]
         try:
             r = await llm.chat.completions.create(model=model, messages=[{"role": "user", "content": "Zeg ok."}], max_tokens=5)
@@ -654,6 +721,10 @@ async def test_verbinding():
         os.environ["REASONING_KONING"] = os.environ["REASONING"]
     await test_denkniveau(llm, "MODEL_KLEIN", "REASONING")
     await test_denkniveau(llm, "MODEL_GROOT", "REASONING_KONING")
+    if os.getenv("MODEL_ROUTERING", "").strip() and os.getenv("REASONING_ROUTERING", "").strip():
+        await test_denkniveau(llm, "MODEL_ROUTERING", "REASONING_ROUTERING")
+    routering = os.environ.get("MODEL_ROUTERING", "").strip() or os.environ["MODEL_KLEIN"]
+    print(f"Modellen: Raadsleden {os.environ['MODEL_KLEIN']!r}, keuzes van de Koning {routering!r}, Verdict {os.environ['MODEL_GROOT']!r}")
 
 
 async def draai_lid(agenten, prompt, opties, naam):
@@ -750,7 +821,7 @@ async def run():
 
         (ROOT / "verdict.json").unlink(missing_ok=True)
         bewaar("trace.json", trace)
-        open_vragen, ronde, mislukt = [], 1, 0
+        open_vragen, ronde, mislukt, sporen = [], 1, 0, []
         budget = tokenbudget()
         kosten_lid, kosten_koning = {}, []
 
@@ -762,12 +833,11 @@ async def run():
             return int(((2 * vraag_ + 6500) if mcp_ else vraag_) * 1.15 + 900)
 
         def schat_routering():
-            formule = int((tokens_geschat(debat_tekst(beurten, namen)) + 1800) * 1.15 + 500)
+            formule = int((tokens_geschat(debat_tekst(beurten, namen, kort_oud=True)) + 1900) * 1.15 + 1200)
             return max(formule, int(max(kosten_koning[-2:]) * 1.1)) if kosten_koning else formule
 
         def schat_verdict():
-            formule = int((tokens_geschat(debat_tekst(beurten, namen)) + 2000) * 1.15 + 2500)
-            return max(formule, int(max(kosten_koning[-2:]) * 1.5)) if kosten_koning else formule
+            return int((tokens_geschat(debat_tekst(beurten, namen)) + 2200) * 1.15 + 6000)
 
         while True:
             gesproken = len(raadsleden_berichten(beurten))
@@ -788,7 +858,7 @@ async def run():
                                 f"en ~{reserve} is gereserveerd voor het Verdict: stop tijdig als het budget krap wordt.")
                 mag_herbekijken = over_tokens >= reserve + 2 * routering_kost + goedkoopst
                 voor = gebruikt(verbruik)
-                rol, vraag, reden, open_vragen = await kies_volgende(beurten, leden, llm, verbruik, open_vragen, budget_tekst, mag_herbekijken)
+                rol, vraag, reden, open_vragen = await kies_volgende(beurten, leden, llm, verbruik, open_vragen, budget_tekst, mag_herbekijken, sporen)
                 if gebruikt(verbruik) > voor:
                     kosten_koning.append(gebruikt(verbruik) - voor)
                 if rol is not None:
@@ -803,6 +873,8 @@ async def run():
             velden = {"aan": rol, "vraag": vraag, "reden": reden}
             if open_vragen:
                 velden["open_vragen"] = open_vragen
+            if sporen:
+                velden["sporen"] = [dict(x) for x in sporen]
             beurt(ronde, "koning", "routering", **velden)
             print(f"\n[Koning] {'stopt' if rol is None else '→ ' + namen[rol]}: {reden}")
             if vraag:
@@ -822,7 +894,7 @@ async def run():
                 print(f"LET OP: {lid.NAAM} las zijn volledige Kennisbron niet; één herkansing.")
                 for tool, args in toolcalls(r):
                     beurt(ronde, rol, "toolcall", tool=tool, argumenten=args, pad=mcp_url)
-                tel_agent(verbruik, "klein", r.usage_details)
+                tel_agent(verbruik, "raadsleden", r.usage_details)
                 try:
                     r2, fout2 = await draai_lid(agenten, prompt + "\n\nLees eerst je volledige Kennisbron met lees_kennisbron, en antwoord dan pas.", opties, lid.NAAM)
                     if r2 is None:
@@ -842,7 +914,7 @@ async def run():
 
             calls = list(toolcalls(r))
             if not al_gelogd:
-                tel_agent(verbruik, "klein", r.usage_details)
+                tel_agent(verbruik, "raadsleden", r.usage_details)
                 for tool, args in calls:
                     beurt(ronde, rol, "toolcall", tool=tool, argumenten=args, pad=mcp_url)
             tekst = normaliseer_ids(re.sub(r"<think>.*?</think>", "", r.text or "", flags=re.S)).strip()
@@ -880,7 +952,7 @@ async def run():
         f"Debat:\n\n{debat_tekst(beurten, namen)}\n\nStel nu het Council Verdict op."
     )
     try:
-        data = await vraag_json(llm, KONING_VERDICT, gebruiker, verbruik)
+        data = await vraag_json(llm, KONING_VERDICT, gebruiker, verbruik, soort="verdict")
     except Exception as e:
         print(f"LET OP: de Koning kon geen Verdict opstellen ({e}).")
         data = {}
@@ -891,7 +963,8 @@ async def run():
     slot_tekst = "\n".join(
         f"- {s}: {verdict['oorzaak'][s]['bewering'] or 'onbekend'} ({', '.join(verdict['oorzaak'][s]['bewijs']) or 'geen bewijs'})" for s in SLOTS
     )
-    beurt(ronde + 1, "koning", "bericht", tekst=f"{verdict['samenvatting']}\n\nOorzaak:\n{slot_tekst}")
+    dwaal_tekst = "\n".join(f"- {d['bewering']} ({namen.get(d['door'], 'onbekend')}): {d.get('waarom') or ''} {', '.join(d['bewijs'])}".rstrip() for d in verdict.get("dwaalsporen", []))
+    beurt(ronde + 1, "koning", "bericht", tekst=f"{verdict['samenvatting']}\n\nOorzaak:\n{slot_tekst}" + (f"\n\nVerworpen dwaalsporen:\n{dwaal_tekst}" if dwaal_tekst else ""))
     print(f"\n[Koning]:\n{verdict['samenvatting']}\n{slot_tekst}")
     if onbekend:
         print(f"LET OP: onbekend gebleven: {', '.join(onbekend)}")

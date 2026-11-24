@@ -118,7 +118,31 @@
   .mini:disabled { opacity: .45; cursor: not-allowed; }
   .mini select { background: transparent; color: inherit; border: 0; font: inherit; cursor: pointer; }
   .mini select option { color: #1d1a36; }
+  .mini.speel { border-color: var(--bladgoud); color: var(--bladgoud); }
+  .spel-hud { display: none; position: absolute; inset: 0; z-index: 4; pointer-events: none; font-family: var(--schrift); color: var(--licht); }
+  .podium.spel .spel-hud { display: block; }
+  .podium.spel .podium-voet, .podium.spel #herbeleef, .podium.spel label.mini, .podium.spel #camerastand { display: none; }
+  .podium.spel canvas { cursor: crosshair; }
+  .vizier { position: absolute; left: 50%; top: 50%; width: 22px; height: 22px; margin: -11px 0 0 -11px; border: 2px solid rgba(255, 255, 255, .85); border-radius: 50%; box-shadow: 0 0 6px #000; }
+  .vizier::after { content: ""; position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; margin: -2px 0 0 -2px; border-radius: 50%; background: var(--fout); }
+  .spel-boven { position: absolute; left: 16px; top: 14px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; text-shadow: 0 1px 3px #000; }
+  .leven { width: 220px; height: 14px; border-radius: 999px; background: rgba(0, 0, 0, .55); border: 1px solid rgba(255, 255, 255, .35); overflow: hidden; }
+  .leven i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #c2264b, #6cd38a); transition: width .2s; }
+  .podium.gezocht .leven { box-shadow: 0 0 0 2px var(--fout), 0 0 14px var(--fout); }
+  .podium.gezocht .spel-teller::after { content: " · GEZOCHT"; color: var(--fout); font-weight: 700; }
+  .spel-wapen { position: absolute; right: 18px; bottom: 16px; font-family: var(--sierlijk); font-size: 26px; color: var(--bladgoud); text-shadow: 0 2px 4px #000; }
+  .spel-wapen b { font-family: var(--schrift); font-size: 30px; margin-left: 6px; }
+  .spel-hulp { position: absolute; left: 16px; bottom: 14px; max-width: 62%; font-size: 13px; color: var(--zacht); text-shadow: 0 1px 3px #000; }
+  .spel-melding { position: absolute; left: 50%; top: 22%; transform: translateX(-50%); padding: 8px 18px; border-radius: 12px; background: rgba(18, 15, 38, .8); border: 1px solid var(--bladgoud); font-family: var(--sierlijk); font-size: 22px; color: var(--kaars); opacity: 0; transition: opacity .3s; white-space: nowrap; }
+  .spel-melding.zichtbaar { opacity: 1; }
+  .spel-pauze { display: none; position: absolute; inset: 0; align-items: center; justify-content: center; background: rgba(10, 8, 24, .55); font-family: var(--sierlijk); font-size: 26px; color: var(--bladgoud); }
+  .podium.spel.pauze .spel-pauze { display: flex; }
+  .schade { position: absolute; inset: 0; box-shadow: inset 0 0 120px 40px rgba(220, 30, 30, .85); opacity: 0; }
+  .schade.flits { animation: schade .5s ease-out; }
+  @keyframes schade { 0% { opacity: 1; } 100% { opacity: 0; } }
   .tag3d { font-family: var(--sierlijk); font-size: 16px; color: var(--kleur); text-shadow: 0 1px 2px #000, 0 0 10px rgba(0, 0, 0, .9); white-space: nowrap; pointer-events: none; }
+  .tag3d { transition: font-size .3s; }
+  .tag3d.actief { font-size: 22px; text-shadow: 0 1px 2px #000, 0 0 16px var(--kleur); }
   .ballon3d { max-width: 290px; padding: 8px 12px 9px; border-radius: 12px; background: linear-gradient(180deg, var(--perkament), var(--perkament-donker)); color: var(--inkt); font: 14px/1.42 var(--boek); border-top: 3px solid var(--kleur); box-shadow: 0 10px 24px rgba(0, 0, 0, .55); opacity: 0; transition: opacity .35s; pointer-events: none; margin-bottom: 8px; }
   .ballon3d.zichtbaar { opacity: 1; }
   .ballon3d.denkt { font-size: 24px; line-height: 1; padding: 4px 14px 10px; letter-spacing: 4px; color: var(--kleur); }
@@ -143,6 +167,16 @@
   .decreet summary:focus-visible, .spreuk summary:focus-visible { outline: 2px solid var(--leylijn); outline-offset: 2px; border-radius: 4px; }
   .decreet ul { margin: 6px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
   .decreet li { padding: 2px 10px; border-radius: 999px; background: rgba(95, 225, 217, .08); border: 1px solid rgba(95, 225, 217, .28); font-size: 13.5px; }
+  .decreet ul.sporen { flex-direction: column; flex-wrap: nowrap; }
+  .decreet li.spoor { border-radius: 10px; }
+  .decreet li.spoor b { font-family: var(--schrift); font-size: 11.5px; margin-right: 4px; }
+  .decreet li.spoor.dwaalspoor { background: rgba(255, 122, 122, .10); border-color: rgba(255, 122, 122, .45); text-decoration: line-through; text-decoration-color: rgba(255, 122, 122, .6); }
+  .decreet li.spoor.dwaalspoor b { color: var(--fout); }
+  .decreet li.spoor.bevestigd { background: rgba(108, 211, 138, .10); border-color: rgba(108, 211, 138, .45); }
+  .decreet li.spoor.bevestigd b { color: var(--ok); }
+  .decreet li.spoor.ongetoetst b { color: var(--kaars); }
+  .dwaal li { margin: 5px 0; }
+  .dwaal li s { text-decoration-color: var(--fout); }
   .decreet.stop { background: linear-gradient(90deg, rgba(108, 211, 138, .10), transparent); border-color: rgba(108, 211, 138, .35); }
 
   .raadpleging { display: flex; gap: 10px; align-items: center; margin: 6px 0 6px 58px; font-family: var(--schrift); font-size: 13.5px; color: var(--zacht); }
@@ -249,6 +283,7 @@
     <section class="podium" aria-label="De Raad van Achrona">
       <div class="stage3d" id="stage3d"></div>
       <div class="stage-knoppen">
+        <button id="speel" class="mini speel" type="button">Speel mee als 2e Koning</button>
         <button id="herbeleef" class="mini" type="button">Herbeleef het debat</button>
         <label class="mini">Tempo <select id="snelheid"><option value="1">rustig</option><option value="1.4" selected>normaal</option><option value="2.2">vlot</option><option value="3.5">snel</option></select></label>
         <button id="camerastand" class="mini" type="button">Camera: draait rond</button>
@@ -496,7 +531,9 @@ function render(trace, verdict) {
     if (b.soort === "routering") {
       toegewezen = b.aan;
       laatsteAan = b.aan; laatsteVraag = b.vraag || ""; laatsteReden = b.reden || ""; laatsteNr = b.nr;
-      const open = (b.open_vragen || []).length ? `<details><summary>Open vragen van de Koning (${b.open_vragen.length})</summary><ul>${b.open_vragen.map(v => `<li>${inline(v)}</li>`).join("")}</ul></details>` : "";
+      const STATUS = { ongetoetst: "ongetoetst", bevestigd: "bevestigd", dwaalspoor: "dwaalspoor" };
+      const sporen = (b.sporen || []).length ? `<details><summary>Sporen van de Koning (${b.sporen.length}, waarvan ${b.sporen.filter(x => x.status === "dwaalspoor").length} dwaalspoor)</summary><ul class="sporen">${b.sporen.map(x => `<li class="spoor ${esc(STATUS[x.status] || "ongetoetst")}"><b>${esc(STATUS[x.status] || "ongetoetst")}</b> ${inline(x.spoor)}${x.door ? ` <span style="color:${kleur(x.door)}">(${esc(naam(x.door))})</span>` : ""}</li>`).join("")}</ul></details>` : "";
+      const open = ((b.open_vragen || []).length ? `<details><summary>Open vragen van de Koning (${b.open_vragen.length})</summary><ul>${b.open_vragen.map(v => `<li>${inline(v)}</li>`).join("")}</ul></details>` : "") + sporen;
       const wie = b.spreker === "koning" ? "De Koning" : esc(naam(b.spreker));
       html += b.aan
         ? `<article class="decreet" style="--kleur:${kleur(b.aan)}"><div class="zegel">${zegelKroon}</div><div><p class="aanhef">${wie} roept <b>de ${esc(naam(b.aan))}</b></p><p class="vraag">${inline(b.vraag)}</p><p class="waarom"><span>Waarom</span>${inline(b.reden)}</p>${open}</div></article>`
@@ -597,7 +634,8 @@ function render(trace, verdict) {
       + slot("Ingreep", o.ingreep) + slot("Mechanisme", o.mechanisme) + slot("Verloop", o.verloop)
       + `<div class="slot"><b>Herstelplan</b><ol>${(verdict.acties || []).map(a => `<li>${inline(a.actie)}</li>`).join("")}</ol></div>`
       + `<div class="slot"><b>Risico's</b><ol>${(verdict.risicos || []).map(r => `<li>${inline(r.risico)}${r.mitigatie ? `<small>${inline(r.mitigatie)}</small>` : ""}</li>`).join("")}</ol></div>`
-      + (vs ? `<div class="slot"><b>Voorspelling: dag ${esc(vs.dag)}</b>${inline(vs.bewering)} ${(vs.bewijs || []).map(inline).join(" ")}</div>` : "");
+      + (vs ? `<div class="slot"><b>Voorspelling: dag ${esc(vs.dag)}</b>${inline(vs.bewering)} ${(vs.bewijs || []).map(inline).join(" ")}</div>` : "")
+      + ((verdict.dwaalsporen || []).length ? `<div class="slot dwaal"><b>Ontmaskerde dwaalsporen</b><ol>${verdict.dwaalsporen.map(d => `<li><s>${inline(d.bewering)}</s>${d.door ? ` <span style="color:${kleur(d.door)}">(${esc(naam(d.door))})</span>` : ""}${d.waarom ? `<small>${inline(d.waarom)} ${(d.bewijs || []).map(inline).join(" ")}</small>` : ""}</li>`).join("")}</ol></div>` : "");
   }
 }
 
