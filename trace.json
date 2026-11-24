@@ -1,5 +1,5 @@
 {
-  "run_id": "2026-11-24T11:31:05+01:00_bfe5867f",
+  "run_id": "2026-11-24T14:00:49+01:00_ae19809d",
   "status": "bezig",
   "raadsleden": [
     "archmage",
@@ -86,9 +86,145 @@
       "spreker": "oracle",
       "soort": "bestand",
       "bestand": "oracle/visioenendagboek.md"
+    },
+    {
+      "nr": 12,
+      "ronde": 1,
+      "spreker": "koning",
+      "soort": "routering",
+      "aan": "engineer",
+      "vraag": "Engineer, leg het debat open met de meetbare feiten. Wanneer begon de Desync precies, en welke logs of metingen uit het datanet bevestigen dat? Geef per waarneming de datum, het tijdstip, de plaats in het datanet en het record-ID. Beschrijf ook wat er in de logs kort voor het eerste symptoom gebeurde: welke wijzigingen, herstarts, configuratie-aanpassingen of schrijfacties zijn vastgelegd, en door wie of welk proces.",
+      "reden": "Er is nog niets gezegd. Meetbare logs wegen het zwaarst, en alleen de Engineer kan het tijdsverloop vastleggen met record-ID's, zoals het begin, de frequentie en de escalatie van de Desync. Dat vormt de basis voor de ingreep en het verloop van het Verdict.",
+      "open_vragen": [
+        "Wanneer begon de Desync precies, en met welk record-ID is dat vastgelegd?",
+        "Welke ingreep (wijziging, herstart, configuratie of schrijfactie) ging vooraf aan het eerste symptoom, en wie of welk proces voerde die uit?",
+        "Hoe verliep de frequentie van de Desync over de dagen heen: nam die toe, bleef die stabiel of namen de episodes af?",
+        "Hoe verhoudt de Desync zich tot de magische leylijnen en de schilden van de burcht: vallen de tijdstippen samen?",
+        "Zijn er eerdere, vergelijkbare gebeurtenissen in het archief met bijbehorende ID's?",
+        "Welke dieren of verstoringen werden in het woud opgemerkt, en wanneer?"
+      ]
+    },
+    {
+      "nr": 13,
+      "ronde": 1,
+      "spreker": "engineer",
+      "soort": "bericht",
+      "tekst": "**Engineer:** Het eerste gemeten symptoom is dag 10, om 03:00, op het datanet zelf: ENG-012 registreert +38% doorvoer na activatie. Die activatie vond plaats om 02:40 op de hulpslag in de datatoren (ENG-011). Ik heb dit zelf uitgevoerd, dus ik heb een belang bij de uitkomst.\n\nHet eerste *afwijkende* verschijnsel is de klacht uit de benedenstad om 04:50 op dag 10: berichten \"half aangekomen\" en een kasboek dat even leeg leek. Dat staat alleen in mijn werkboek (ENG-107), niet in de installatielog. Het is dus een waarneming van derden, geen meting.\n\nVóór de activatie zijn vastgelegd: de proefopstelling in de kelder (ENG-010, dag 9, 16:45) en de goedkeuring \"niet ruchtbaar maken\" (ENG-105). Er is geen herstart of configuratiewijziging van het datanet zelf vastgelegd in de twee uur ervoor.\n\nHet volgende vastgelegde afwijkende verschijnsel is pakketverlies op poort oost, dag 22, 04:15 (ENG-026). Ik lees dat niet als hackers, zoals ENG-110 suggereert, maar als wat de Oracle of Archmage daarover zeggen, moet getoetst worden aan de logs.",
+      "bewijs": [
+        "ENG-010",
+        "ENG-011",
+        "ENG-012",
+        "ENG-026",
+        "ENG-105",
+        "ENG-107",
+        "ENG-110"
+      ],
+      "onbevestigd": []
+    },
+    {
+      "nr": 14,
+      "ronde": 1,
+      "spreker": "koning",
+      "soort": "routering",
+      "aan": "archmage",
+      "vraag": "Archmage, de Engineer meldt het eerste gemeten symptoom op dag 10 om 03:00 (ENG-012, +38% doorvoer), twee uur na de activatie van de hulpslag in de datatoren om 02:40 (ENG-011). De proefopstelling in de kelder stond op dag 9 om 16:45 (ENG-010). Heeft u op dezelfde dag en tijdstippen een afwijking in de leylijnen gemeten of waargenomen, en koppelt de proefopstelling of de hulpslag volgens u aan die leylijnen? Noem het tijdstip, de plaats in de leylijn en het record-ID van die waarneming, en leg uit of de magische aantasting aan de activatie voorafging of erop volgde.",
+      "reden": "De Engineer geeft een gemeten tijdlijn (ENG-010, ENG-011, ENG-012) en wijst de magische verklaring van de Archmage nog niet toetsend af of bevestigt die; alleen de leylijnen kunnen laten zien of de ingreep een magisch mechanisme is of dat de magie een gevolg is. Dit vult het mechanisme-deel van de oorzaak in.",
+      "open_vragen": [
+        "Wie gaf de goedkeuring 'niet ruchtbaar maken' (ENG-105) en waarom vóór de activatie?",
+        "Wie of wat zit achter de hackers-claim in ENG-110, en is die claim met logs te toetsen?",
+        "Wat is de oorzaak van het pakketverlies op poort oost op dag 22 om 04:15 (ENG-026): koppelt het aan de activatie of aan een nieuwe ingreep?",
+        "Welke dieren of verstoringen in het woud werden rond dag 9 tot 10 opgemerkt, en met welke ID's?",
+        "Zijn er in het archief eerdere gebeurtenissen met hetzelfde patroon van ingreep en latere doorvoerpiek?",
+        "Hoe verliep de frequentie van de Desync over de dagen: stabiel, toenemend of afnemend?"
+      ]
+    },
+    {
+      "nr": 15,
+      "ronde": 1,
+      "spreker": "archmage",
+      "soort": "bericht",
+      "tekst": "Koning, mijn bron bevat geen meting of waarneming van dag 9 of dag 10. De tijdstippen 16:45, 02:40 en 03:00 komen er niet in voor. De metingen vallen op dag 7, 14, 21, 28, 35 en 42. Dag 7 is normaal (ARC-001 t/m ARC-014, sterkte 7.0 tot 8.7). De volgende meting is dag 14, en dan stonden alle veertien lijnen laag, met de Burchtader op 3.6 (ARC-015). Wat er tussen dag 7 en dag 14 gebeurde, kan mijn bron dus niet vaststellen. Ik kan daarom niet zeggen of de aantasting aan de activatie voorafging of erop volgde.\n\nAan de Engineer: ENG-010, ENG-011, ENG-012 en de andere ENG-ID's staan niet in mijn bron. Ik kan ze niet bevestigen of weerleggen.\n\nMijn eigen overtuiging, los van wat de bron vaststelt: het datanet vervuilt de leylijnen, zoals ik in ARC-109 en ARC-112 schreef. Dat is een opvatting, geen gemeten feit.\n\nLet ook op ARC-106 (dag 8). Daarin staat dat de toren had gevraagd het net \"op eigen maat te laten lopen\" bij de datatoren, en dat dit niet ruchtbaar gemaakt moest worden tot het draait. Dat valt buiten mijn kennis. De Koning kan de datatoren daarover bevragen, en de Engineer ook.",
+      "bewijs": [
+        "ARC-001",
+        "ARC-014",
+        "ARC-015",
+        "ARC-106",
+        "ARC-109",
+        "ARC-112"
+      ],
+      "onbevestigd": []
+    },
+    {
+      "nr": 16,
+      "ronde": 1,
+      "spreker": "koning",
+      "soort": "routering",
+      "aan": "beast_master",
+      "vraag": "Beast Master, de Engineer meldt dat het eerste gemeten symptoom op dag 10 om 03:00 lag (ENG-012), twee uur na de activatie van de hulpslag om 02:40 (ENG-011), en dat de proefopstelling in de kelder op dag 9 om 16:45 plaatsvond (ENG-010). De Archmage kan de leylijnen op die dagen niet bevestigen, want zijn bron mist dag 9 en 10. U merkt een verstoring eerst aan de onrust van de dieren. Wanneer begon die onrust in het woud, en was die er al vóór dag 10 om 02:40 of pas daarna? Noem per waarneming de dag, het tijdstip, de plaats en het record-ID, en zeg of de waarneming vóór of na de proefopstelling of de activatie valt.",
+      "reden": "De Engineer en de Archmage hebben beiden geen onafhankelijke tijdlijn voor dag 9 tot 10. De Beast Master is de enige bron die de aantasting vroeger kan opmerken en die niet door de Engineer zelf is gemeten, dus die kan vaststellen of het mechanisme aan de activatie voorafging of erop volgde.",
+      "open_vragen": [
+        "Wie gaf de goedkeuring 'niet ruchtbaar maken' (ENG-105) en waarom vóór de activatie, en klopt die met de verzoek om het net 'op eigen maat te laten lopen' in ARC-106?",
+        "Wie of wat zit achter de hackers-claim in ENG-110, en is die claim met logs te toetsen?",
+        "Wat veroorzaakte het pakketverlies op poort oost op dag 22 om 04:15 (ENG-026): de activatie of een nieuwe ingreep?",
+        "Welke dieren of verstoringen in het woud werden op dag 9 tot 10 opgemerkt, en met welke ID's? (Beast Master)",
+        "Wat gebeurde er in de leylijnen tussen dag 7 en dag 14, waarvoor geen meting in de bron van de Archmage staat?",
+        "Zijn er in het archief eerdere gebeurtenissen met hetzelfde patroon van ingreep en latere doorvoerpiek? (Historian)"
+      ]
+    },
+    {
+      "nr": 17,
+      "ronde": 1,
+      "spreker": "beast_master",
+      "soort": "bericht",
+      "tekst": "Koning, vóór dag 10 om 02:40 laat het logboek geen sterke onrust zien. De eerste hoge waarden staan op dag 10: om 04:40 wolven bij de omgevallen den in het diepe woud (BEA-019, onrust 4) en om 04:50 herten van dezelfde open plek (BEA-020, onrust 4). Die vallen dus ná de activatie van 02:40 en ná de eerste meting van de Engineer om 03:00 (ENG-012).\n\nDe proefopstelling van dag 9 om 16:45 (ENG-010) ging daaraan vooraf. De waarnemingen van die dag die ik heb, BEA-017 (dag 9, 04:20, onrust 1) en BEA-018 (dag 9, 13:30, onrust 2), liggen er vóór en zijn klein.\n\nEr zijn wel lichte signalen eerder: BEA-005 (dag 3, 08:40, kraai bij de oude eik, onrust 1) en BEA-015 (dag 8, 00:20, wolf, onrust 1). Die zijn te gering om als begin te tellen.\n\nWat vaststaat: de sterke onrust begint op dag 10 om 04:40, twee uur na de activatie. Wat ik erbij denk: ik ben overtuigd dat de kabels bij de oude eik de oorzaak zijn (BEA-109, BEA-115). Mijn bron laat geen verband zien tussen die kabels en de onrust van dag 10. Ik heb daar een belang bij, dus neem het als mijn mening.",
+      "bewijs": [
+        "BEA-005",
+        "BEA-015",
+        "BEA-017",
+        "BEA-018",
+        "BEA-019",
+        "BEA-020",
+        "BEA-109",
+        "BEA-115"
+      ],
+      "onbevestigd": []
+    },
+    {
+      "nr": 18,
+      "ronde": 1,
+      "spreker": "koning",
+      "soort": "routering",
+      "aan": "historian",
+      "vraag": "Historian, de Engineer meldt de activatie van de hulpslag in de datatoren op dag 10 om 02:40 (ENG-011), met +38% doorvoer om 03:00 (ENG-012) en pakketverlies op poort oost op dag 22 om 04:15 (ENG-026). De Beast Master vond de sterke onrust pas om 04:40 (BEA-019) en 04:50 (BEA-020), dus na de activatie. Zoek in het archief naar eerdere activaties van de hulpslag of andere ingrepen in de datatoren. Noem per geval de datum, het tijdstip, het record-ID en wat er daarna gebeurde in het datanet, de leylijnen en het woud. Vermeld ook of er een goedkeuring vóór de ingreep is vastgelegd, zoals ENG-105, en of het verzoek om het net 'op eigen maat te laten lopen' (ARC-106, dag 8) ook eerder voorkwam. Kijk ook of een vergelijkbare ingreep eerder gevolgd werd door een doorvoerpiek of een latere storing.",
+      "reden": "De Engineer en de Beast Master leggen de ingreep (ENG-011, dag 10 02:40) en het eerste symptoom (ENG-012, BEA-019) vast, maar de keten 'ingreep, mechanisme, verloop' is nog niet bewezen. De Historian is de enige Rol die eerdere gevallen kan vergelijken, en heeft nog niet gesproken, dus die vult het ontbrekende patroon en het verloop in de tijd in.",
+      "open_vragen": [
+        "Wie gaf de goedkeuring 'niet ruchtbaar maken' (ENG-105) en was die vóór de activatie op dag 10 02:40 (ENG-011)? Klopt die met het verzoek 'op eigen maat te laten lopen' (ARC-106, dag 8)?",
+        "Wie of wat zit achter de hackers-claim (ENG-110), en is die met logs te toetsen?",
+        "Wat veroorzaakte het pakketverlies op poort oost op dag 22 om 04:15 (ENG-026): de activatie van dag 10 of een nieuwe ingreep?",
+        "Wat gebeurde er in de leylijnen tussen dag 7 en dag 14, waarvoor de Archmage geen meting heeft?",
+        "Hoe hangen de kabels bij de oude eik (BEA-109, BEA-115) samen met de onrust van dag 10 (BEA-019, BEA-020), of zijn dat twee losse oorzaken?",
+        "Hebben de Guardian Keeper of de Oracle een bres, lek of teken op dag 10 tussen 02:40 en 04:50 vastgelegd?"
+      ]
     }
   ],
   "geschillen": [],
-  "verbruik": {},
-  "aan_het_woord": "koning"
+  "verbruik": {
+    "groot": {
+      "beurten": 4,
+      "invoer": 13483,
+      "gecached": 0,
+      "uitvoer": 5241
+    },
+    "klein": {
+      "beurten": 3,
+      "invoer": 29832,
+      "gecached": 0,
+      "uitvoer": 5335
+    }
+  },
+  "aan_het_woord": "historian",
+  "tokens": {
+    "budget": 150000,
+    "gebruikt": 47393
+  }
 }

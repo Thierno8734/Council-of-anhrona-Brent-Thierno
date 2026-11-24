@@ -3,6 +3,7 @@ import json
 import os
 import re
 import sys
+import time
 import uuid
 from contextlib import AsyncExitStack
 from datetime import datetime
@@ -23,6 +24,7 @@ BEURTENBUDGET = 10
 LID_LAATSTE = 6
 TEKENS_PER_TOKEN = 3.2
 SLOTS = ("ingreep", "mechanisme", "verloop")
+BEZET_TOT = {"MODEL_KLEIN": 0.0, "MODEL_GROOT": 0.0}
 MAX_WOORDEN = 300
 ID_RE = re.compile(r"\b(ARC|ENG|GUA|HIS|ORA|BEA)\s?[-‐‑‒–—―−]\s?([0-9]{3})\b")
 
@@ -138,6 +140,8 @@ async def wacht_op_limiet(e, wie, wachten):
     if not w or wachten >= 4:
         return False
     print(f"LET OP: alle modellen zijn even bezet (rate limit) bij {wie}; ik wacht {w} s en probeer opnieuw ({wachten + 1}/4).")
+    if wachten == 0:
+        print("         Dit wachten is normaal: druk niet op Ctrl+C. Zonder wachten: gebruik het Roboest-endpoint of voeg provider-keys toe in FreeLLMAPI.")
     await asyncio.sleep(w)
     return True
 
@@ -173,7 +177,20 @@ def controleer(leden):
 
 
 def async_llm():
-    return AsyncOpenAI(base_url=os.environ["OPENAI_BASE_URL"], api_key=os.environ["OPENAI_API_KEY"], max_retries=8)
+    return AsyncOpenAI(base_url=os.environ["OPENAI_BASE_URL"], api_key=os.environ["OPENAI_API_KEY"], max_retries=3)
+
+
+def ander_model(env):
+    ander = "MODEL_KLEIN" if env == "MODEL_GROOT" else "MODEL_GROOT"
+    return ander if os.environ.get(ander) and os.environ[ander] != os.environ.get(env) else None
+
+
+def markeer_bezet(env, e):
+    BEZET_TOT[env] = time.time() + (limiet_wachttijd(e) or 60)
+
+
+def is_bezet(env):
+    return time.time() < BEZET_TOT.get(env, 0.0)
 
 
 def client(model_env):
@@ -271,20 +288,33 @@ def toolresultaten(response):
     return "\n".join(delen)
 
 
+def koning_model():
+    env = "MODEL_GROOT"
+    if is_bezet(env) and ander_model(env) and not is_bezet(ander_model(env)):
+        env = ander_model(env)
+    niveau = denkniveau("REASONING_KONING" if env == "MODEL_GROOT" else "REASONING")
+    return env, {"reasoning_effort": niveau} if niveau else {}
+
+
 async def vraag_json(llm, systeem, gebruiker, verbruik, pogingen=3):
-    model = os.environ["MODEL_GROOT"]
-    niveau = denkniveau("REASONING_KONING")
-    extra = {"reasoning_effort": niveau} if niveau else {}
+    env, extra = koning_model()
     berichten = [{"role": "system", "content": systeem}, {"role": "user", "content": gebruiker}]
     fout, poging, wachten = None, 0, 0
     while poging < pogingen:
-        kwargs = {"model": model, "messages": berichten, **extra}
+        kwargs = {"model": os.environ[env], "messages": berichten, **extra}
         if poging == 0:
             kwargs["response_format"] = {"type": "json_object"}
         try:
             r = await llm.chat.completions.create(**kwargs)
         except Exception as e:
             fout = e
+            if limiet_wachttijd(e):
+                markeer_bezet(env, e)
+                nieuw_env, nieuw_extra = koning_model()
+                if nieuw_env != env and not is_bezet(nieuw_env):
+                    print(f"LET OP: {env}={os.environ[env]!r} zit vol; de Koning wijkt uit naar {nieuw_env}={os.environ[nieuw_env]!r}.")
+                    env, extra = nieuw_env, nieuw_extra
+                    continue
             if await wacht_op_limiet(e, "de Koning", wachten):
                 wachten += 1
                 continue
@@ -312,8 +342,9 @@ async def vraag_json(llm, systeem, gebruiker, verbruik, pogingen=3):
 
 async def kort_in(llm, tekst, verbruik):
     try:
+        env = "MODEL_GROOT" if is_bezet("MODEL_KLEIN") and ander_model("MODEL_KLEIN") else "MODEL_KLEIN"
         r = await llm.chat.completions.create(
-            model=os.environ["MODEL_KLEIN"],
+            model=os.environ[env],
             messages=[{"role": "system", "content": INKORTEN}, {"role": "user", "content": tekst}],
         )
     except Exception as e:
@@ -612,7 +643,7 @@ async def test_verbinding():
                 sys.exit(f"Het LLM-endpoint {url} weigert de key (HTTP {e.status_code}). Klopt OPENAI_API_KEY in .env?")
             if e.status_code == 404:
                 sys.exit(f"Het LLM-endpoint {url} kent model {model!r} ({env}) of het pad niet (HTTP 404). Eindigt OPENAI_BASE_URL op /v1?")
-            print(f"LET OP: testcall met {env}={model!r} gaf HTTP {e.status_code}: {e.message}")
+            print(f"LET OP: testcall met {env}={model!r} gaf HTTP {e.status_code}: {kort_fout(e.message)}")
             continue
         if isinstance(r, str) or not getattr(r, "choices", None):
             sys.exit(f"Het LLM-endpoint {url} gaf geen JSON terug maar {str(r)[:80]!r}…\n"
@@ -625,13 +656,21 @@ async def test_verbinding():
     await test_denkniveau(llm, "MODEL_GROOT", "REASONING_KONING")
 
 
-async def draai_lid(agent, prompt, opties, naam):
+async def draai_lid(agenten, prompt, opties, naam):
     fout, pogingen, wachten = None, 0, 0
     while pogingen < 3:
+        env = "MODEL_KLEIN"
+        if is_bezet(env) and "MODEL_GROOT" in agenten and not is_bezet("MODEL_GROOT"):
+            env = "MODEL_GROOT"
         try:
-            return await agent.run(prompt, options=opties), None
+            return await agenten[env].run(prompt, options=opties), None
         except Exception as e:
             fout = e
+            if limiet_wachttijd(e):
+                markeer_bezet(env, e)
+                if env == "MODEL_KLEIN" and "MODEL_GROOT" in agenten and not is_bezet("MODEL_GROOT"):
+                    print(f"LET OP: MODEL_KLEIN={os.environ['MODEL_KLEIN']!r} zit vol; {naam} wijkt uit naar MODEL_GROOT={os.environ['MODEL_GROOT']!r}.")
+                    continue
             if await wacht_op_limiet(e, naam, wachten):
                 wachten += 1
                 continue
@@ -688,6 +727,7 @@ async def run():
         bewaar("trace.json", trace)
 
     klein = client("MODEL_KLEIN")
+    groot = client("MODEL_GROOT")
     llm = async_llm()
     namen = {l.ROL: l.NAAM for l in leden}
     bevestigd_pool = set()
@@ -702,7 +742,10 @@ async def run():
                 beurt(0, lid.ROL, "bestand", bestand=f"{lid.ROL}/{p.name}")
             instr = instructies(lid, bestanden, mcp_url, leden)
             context = "\n".join(p.read_text(encoding="utf-8") for p in bestanden)
-            per_rol[lid.ROL] = (lid, mcp_url, Agent(klein, instr, name=lid.ROL, tools=tools), context)
+            agenten = {"MODEL_KLEIN": Agent(klein, instr, name=lid.ROL, tools=tools)}
+            if ander_model("MODEL_KLEIN"):
+                agenten["MODEL_GROOT"] = Agent(groot, instr, name=lid.ROL, tools=tools)
+            per_rol[lid.ROL] = (lid, mcp_url, agenten, context)
             instr_per_rol[lid.ROL] = instr
 
         (ROOT / "verdict.json").unlink(missing_ok=True)
@@ -767,12 +810,12 @@ async def run():
             if rol is None:
                 break
 
-            lid, mcp_url, agent, context = per_rol[rol]
+            lid, mcp_url, agenten, context = per_rol[rol]
             prompt = f"Debat tot nu toe:\n\n{debat_voor_lid(beurten[:-1], namen)}\n\nVraag van de Koning aan jou: {vraag}"
             voor_lid = gebruikt(verbruik)
             trace["aan_het_woord"] = rol
             bewaar("trace.json", trace)
-            r, fout = await draai_lid(agent, prompt, opties, lid.NAAM)
+            r, fout = await draai_lid(agenten, prompt, opties, lid.NAAM)
             al_gelogd = False
             eerste_beurt = not any(b["spreker"] == rol for b in raadsleden_berichten(beurten))
             if r is not None and mcp_url and eerste_beurt and not any("lees_kennisbron" in n for n, _ in toolcalls(r)):
@@ -781,7 +824,10 @@ async def run():
                     beurt(ronde, rol, "toolcall", tool=tool, argumenten=args, pad=mcp_url)
                 tel_agent(verbruik, "klein", r.usage_details)
                 try:
-                    r = await agent.run(prompt + "\n\nLees eerst je volledige Kennisbron met lees_kennisbron, en antwoord dan pas.", options=opties)
+                    r2, fout2 = await draai_lid(agenten, prompt + "\n\nLees eerst je volledige Kennisbron met lees_kennisbron, en antwoord dan pas.", opties, lid.NAAM)
+                    if r2 is None:
+                        raise RuntimeError(kort_fout(fout2))
+                    r = r2
                 except Exception as e:
                     al_gelogd = True
                     print(f"LET OP: de herkansing van {lid.NAAM} mislukte ({e}); het eerste antwoord blijft staan.")
@@ -866,7 +912,10 @@ async def run():
 
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
-    asyncio.run(run())
+    try:
+        asyncio.run(run())
+    except KeyboardInterrupt:
+        sys.exit("\nGestopt met Ctrl+C. trace.json is onvolledig (status 'bezig') en er is geen verdict.json: commit deze run niet.")
 
 
 if __name__ == "__main__":
