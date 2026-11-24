@@ -21,6 +21,7 @@ ROLLEN = ("archmage", "engineer", "guardian_keeper", "historian", "oracle", "bea
 PREFIX = {"archmage": "ARC", "engineer": "ENG", "guardian_keeper": "GUA", "historian": "HIS", "oracle": "ORA", "beast_master": "BEA"}
 BEURTENBUDGET = 10
 SLOTS = ("ingreep", "mechanisme", "verloop")
+MAX_WOORDEN = 300
 ID_RE = re.compile(r"\b(ARC|ENG|GUA|HIS|ORA|BEA)\s?[-‐‑‒–—―−]\s?([0-9]{3})\b")
 
 
@@ -43,12 +44,28 @@ Zo kies je goed:
 4. Een bewering zonder bevestigde ID telt niet: laat ze staven of weerleggen.
 5. Wees wantrouwig tegenover verklaringen die precies het Belang van de spreker dienen.
 6. Vraag naar concrete dagen, tijdstippen, plaatsen en ID's. Vraag nooit om een samenvatting of herhaling.
+7. Meetbare records (logs, metingen, rapporten, registers) wegen zwaarder dan interpretaties, overtuigingen of visioenen. Toets een interpretatie bij de Rol wiens bron het gemeten feit bevat.
+8. Vallen de bronnen van twee Rollen samen op hetzelfde tijdstip of dezelfde plaats, of beschrijft een bron hoe iets werkt? Laat de andere betrokken Rol uitleggen hoe die stukken samenhangen: daar zit meestal het mechanisme.
+9. Verwijst een Raadslid naar een andere Rol? Overweeg die Rol als volgende.
+10. Een vraag aan een Raadslid dat nog niet sprak, sluit aan bij wat al gezegd is: noem de beurt of het ID waarop het moet reageren.
 
-Stop het debat (rol null) zodra de drie delen van de oorzaak gestaafd zijn met bevestigde ID's en er geen open tegenspraak meer is, of als geen Raadslid nog iets nieuws kan toevoegen. Stoppen vóór het budget op is, is een goede keuze als je genoeg weet.
+Stop het debat (rol null) pas als de drie delen van de oorzaak één samenhangende keten vormen, gestaafd met bevestigde ID's, en elke tegenspraak beslecht is. Heb je nog beurten en open vragen of open tegenspraak, gebruik ze. Stoppen vóór het budget op is, is een goede keuze als je echt genoeg weet.
 
 Antwoord met alleen één JSON-object:
 {{"rol": "<een rol-id uit de lijst, of null om te stoppen>", "vraag": "<de vraag aan dat Raadslid, of null>", "reden": "<1-2 concrete zinnen: welke beurt of welk ID aanleiding geeft en welk deel van de oorzaak dit invult>", "open_vragen": ["<korte open vraag>", "..."]}}
 open_vragen: wat na deze keuze nog onbeantwoord is (hoogstens 6). Haal weg wat beantwoord is."""
+
+
+KONING_STOP = """Je wilde het debat stoppen. Kijk nog één keer kritisch:
+{punten}
+Beslis opnieuw. Spraken er Raadsleden nog niet, kies er dan één en stel een gerichte vraag die aansluit bij het debat (noem de beurt of het ID waarop het moet reageren).
+Anders: kies wie een open vraag of tegenspraak kan beslechten, of bevestig dat je stopt met een concrete reden.
+Antwoord met hetzelfde JSON-object als daarnet."""
+
+
+INKORTEN = """Hieronder staat het antwoord van een Raadslid, maar er staat ook zijn denkproces in.
+Geef alleen het eindantwoord dat het Raadslid aan de Council geeft, in hoogstens 180 woorden, in de ik-vorm.
+Neem record-ID's letterlijk over. Voeg niets toe wat er niet staat. Geen inleiding, geen uitleg over wat je doet."""
 
 
 KONING_VERDICT = """Je bent de Koning van de Council of Achrona. Het debat is voorbij en jij stelt het Council Verdict op.
@@ -57,12 +74,17 @@ Je hebt geen Kennisbron: je gebruikt alleen wat de Raadsleden in het debat inbra
 Regels:
 - Gebruik als bewijs alleen ID's uit de lijst met bevestigde ID's hieronder, met een gewoon koppelteken (bv. XXX-123).
 - Elk Raadslid heeft een Belang en kan ernaast zitten. Weeg tegenspraak af op bewijs, niet op wie het luidst sprak.
+- Kies één samenhangende oorzaakketen: de ingreep veroorzaakt het mechanisme, en het mechanisme verklaart het verloop. Geen opsomming van alle theorieën.
+- Meetbare records (logs, metingen, rapporten, registers) wegen zwaarder dan interpretaties, overtuigingen en visioenen. Een verklaring die precies het Belang van de spreker dient, is verdacht tot een andere bron ze bevestigt.
+- Verzin geen mechanisme of feit dat niet in het debat staat.
+- Noem ID's altijd apart, nooit als bereik.
 - Weet je een deel van de oorzaak niet zeker genoeg? Zet "bewering" op null en "bewijs" op [].
 - zekerheid: jouw eerlijke inschatting tussen 0 en 1 per deel van de oorzaak.
 - acties: het herstelplan in uitvoeringsvolgorde (eerst wat schade stopt, dan herstel, dan voorkomen).
 - risicos: minstens één, elk met een mitigatie.
 - voorspelling: alleen als het verloop een patroon in de tijd toont waaruit je kan afleiden op welke dag de Desync opnieuw toeslaat als niemand ingrijpt; anders null.
-- geschillen: elk punt waarover Raadsleden het oneens waren, met per Rol hun standpunt en hoe het beslecht werd (uitkomst null als het open bleef).
+- voorspelling: steun ze bij voorkeur op gemeten records, niet op één bron alleen.
+- geschillen: elk punt waarover Raadsleden het oneens waren, met per Rol hun standpunt en hoe het bewijs het beslecht. Uitkomst null alleen als het echt open bleef.
 
 Antwoord met alleen één JSON-object in deze vorm:
 {
@@ -80,7 +102,8 @@ Antwoord met alleen één JSON-object in deze vorm:
 
 
 def normaliseer_ids(tekst):
-    return ID_RE.sub(lambda m: f"{m.group(1)}-{m.group(2)}", tekst or "")
+    tekst = ID_RE.sub(lambda m: f"{m.group(1)}-{m.group(2)}", tekst or "")
+    return tekst.replace("\u2011", "-").replace("\u2010", "-")
 
 
 def vind_ids(tekst):
@@ -130,10 +153,12 @@ def kennisbron_bestanden(rol):
     return sorted(p for p in map_.glob("*") if p.suffix in (".md", ".csv")) if map_.is_dir() else []
 
 
-def instructies(lid, bestanden, mcp):
+def instructies(lid, bestanden, mcp, leden):
+    anderen = ", ".join(l.NAAM for l in leden if l.ROL != lid.ROL)
     tekst = (
         f"Je bent de {lid.NAAM}, een Raadslid in de Council of Achrona. {lid.PERSPECTIEF}\n"
-        "Je debatteert met de andere Raadsleden over de oorzaak van de Desync. De Koning leidt het debat en stelt jou telkens één vraag.\n\n"
+        "Je debatteert met de andere Raadsleden over de oorzaak van de Desync. De Koning leidt het debat en stelt jou telkens één vraag.\n"
+        f"De andere Raadsleden zijn: {anderen}. Verwijs naar hen met die namen.\n\n"
         "Regels:\n"
         f"- Baseer je alleen op je eigen Kennisbron. Jouw record-ID's beginnen met {PREFIX[lid.ROL]}-. "
         "Noem bij elke bewering de record-ID's precies zoals ze in je Kennisbron staan, met een gewoon koppelteken '-'. Verzin nooit een ID.\n"
@@ -141,15 +166,19 @@ def instructies(lid, bestanden, mcp):
         "- Strookt iets wat een ander Raadslid zei niet met jouw Kennisbron? Zeg dat expliciet, met jouw ID's.\n"
         "- Verwijst je Kennisbron naar een andere Rol, persoon of plaats? Meld dat, zodat de Koning die Rol kan bevragen.\n"
         "- Je hebt een Belang en kan ernaast zitten: scheid wat je bron vaststelt van wat jij erover denkt.\n"
-        "- Weet je iets niet, zeg dat eerlijk. Herhaal niet wat al gezegd is. Hoogstens 180 woorden."
+        "- Weet je iets niet, zeg dat eerlijk. Herhaal niet wat al gezegd is. Hoogstens 180 woorden.\n"
+        "- Schrijf alleen je eindantwoord aan de Council: geen denkproces, geen plan, geen opsomming van wat je gaat opzoeken."
     )
     if mcp:
         tekst += (
-            "\n\nJe ziet je Kennisbron alleen via je tools. Gebruik ze altijd vóór je spreekt: "
-            "zoek of zoek_betekenis om relevante records te vinden, toon om records op ID te lezen, lees_kennisbron om alles te lezen. "
-            "Noem alleen ID's die je in een tool-resultaat zag."
+            "\n\nJe ziet je Kennisbron alleen via je tools. Begin elke beurt met lees_kennisbron: zo lees je je volledige Kennisbron. "
+            "Gebruik daarna zoek, zoek_betekenis of toon om gericht te zoeken. "
+            "Het woord 'Desync' staat waarschijnlijk niet letterlijk in je bron: kijk naar de verschijnselen (storingen, afwijkingen, tijdstippen) "
+            "en naar hoe de dingen werken die je bron beschrijft. Noem alleen ID's die je in een tool-resultaat zag."
         )
     elif bestanden:
+        tekst += ("\n\nHet woord 'Desync' staat waarschijnlijk niet letterlijk in je bron: kijk naar de verschijnselen "
+                  "(storingen, afwijkingen, tijdstippen) en naar hoe de dingen werken die je bron beschrijft.")
         tekst += "\n\nJe Kennisbron:\n\n" + "\n\n".join(f"## {p.name}\n\n{p.read_text(encoding='utf-8')}" for p in bestanden)
     else:
         tekst += "\n\nJe hebt nog geen Kennisbron: zeg dat je niets kan bewijzen."
@@ -211,7 +240,8 @@ def toolresultaten(response):
 
 async def vraag_json(llm, systeem, gebruiker, verbruik, pogingen=3):
     model = os.environ["MODEL_GROOT"]
-    extra = {"reasoning_effort": os.environ["REASONING"]} if os.getenv("REASONING") else {}
+    niveau = denkniveau("REASONING_KONING")
+    extra = {"reasoning_effort": niveau} if niveau else {}
     berichten = [{"role": "system", "content": systeem}, {"role": "user", "content": gebruiker}]
     fout = None
     for poging in range(pogingen):
@@ -222,6 +252,10 @@ async def vraag_json(llm, systeem, gebruiker, verbruik, pogingen=3):
             r = await llm.chat.completions.create(**kwargs)
         except Exception as e:
             fout = e
+            await asyncio.sleep(2)
+            continue
+        if isinstance(r, str) or not getattr(r, "choices", None):
+            fout = RuntimeError(f"het endpoint gaf geen JSON-antwoord terug: {str(r)[:80]!r}")
             await asyncio.sleep(2)
             continue
         tel_openai(verbruik, "groot", r.usage)
@@ -235,6 +269,27 @@ async def vraag_json(llm, systeem, gebruiker, verbruik, pogingen=3):
             {"role": "user", "content": "Antwoord alleen met één geldig JSON-object, zonder tekst eromheen."},
         ]
     raise RuntimeError(fout)
+
+
+async def kort_in(llm, tekst, verbruik):
+    try:
+        r = await llm.chat.completions.create(
+            model=os.environ["MODEL_KLEIN"],
+            messages=[{"role": "system", "content": INKORTEN}, {"role": "user", "content": tekst}],
+        )
+    except Exception as e:
+        print(f"LET OP: inkorten mislukte ({e}); het volledige antwoord blijft staan.")
+        return None
+    if isinstance(r, str) or not getattr(r, "choices", None):
+        return None
+    tel_openai(verbruik, "klein", r.usage)
+    kort = normaliseer_ids(re.sub(r"<think>.*?</think>", "", r.choices[0].message.content or "", flags=re.S)).strip()
+    if not kort or len(kort.split()) >= len(tekst.split()):
+        return None
+    if not set(vind_ids(kort)) <= set(vind_ids(tekst)):
+        print("LET OP: de ingekorte versie bevatte nieuwe ID's; het volledige antwoord blijft staan.")
+        return None
+    return kort
 
 
 def raadsleden_berichten(beurten):
@@ -296,30 +351,61 @@ async def kies_volgende(beurten, leden, llm, verbruik, open_vragen):
         rol, vraag, reden = regel_keuze(beurten, leden, "Koning-agent gaf geen antwoord")
         return rol, vraag, reden, open_vragen
 
-    rol = data.get("rol")
-    rol = None if rol in (None, "", "null", "None") else str(rol).strip().lower()
-    vraag = (data.get("vraag") or "").strip() or None
-    reden = (data.get("reden") or "").strip() or "geen reden opgegeven"
-    nieuwe_open = [str(v).strip() for v in (data.get("open_vragen") or []) if str(v).strip()][:6]
+    rol, vraag, reden, nieuwe_open, geldig = ontleed(data, namen, leden)
+    if not geldig:
+        r, v, rd = regel_keuze(beurten, leden, f"Koning koos onbekende Rol {data.get('rol')!r}")
+        return r, v, rd, nieuwe_open or open_vragen
 
-    if rol is not None and rol not in namen:
-        zelfde = [l.ROL for l in leden if l.NAAM.lower() == rol or l.ROL.replace("_", " ") == rol.replace("_", " ")]
-        rol = zelfde[0] if zelfde else None
-        if rol is None:
-            r, v, rd = regel_keuze(beurten, leden, f"Koning koos onbekende Rol {data.get('rol')!r}")
-            return r, v, rd, nieuwe_open or open_vragen
-
-    if rol is None:
+    if rol is None and over > 0:
         stil = [l for l in leden if telling[l.ROL] == 0]
-        if stil and os.getenv("IEDEREEN_HOREN", "1") != "0" and over >= len(stil):
+        moet_horen = bool(stil) and os.getenv("IEDEREEN_HOREN", "1") != "0" and over >= len(stil)
+        punten = []
+        if stil:
+            punten.append("- Nog niet gesproken: " + ", ".join(f"{l.ROL} ({l.NAAM})" for l in stil)
+                          + ". Hun Kennisbron kan net het ontbrekende stuk of het tegenbewijs bevatten.")
+        if nieuwe_open:
+            punten.append("- Je eigen open vragen: " + "; ".join(nieuwe_open))
+        if stil or nieuwe_open:
+            punten.append(f"- Er zijn nog {over} Raadslid-beurten over.")
+            herzien = (gebruiker + f"\n\nJe eerste beslissing: {json.dumps(data, ensure_ascii=False)}\n\n"
+                       + KONING_STOP.format(punten="\n".join(punten)))
+            try:
+                data2 = await vraag_json(llm, KONING_ROUTERING.format(budget=BEURTENBUDGET), herzien, verbruik)
+                rol2, vraag2, reden2, open2, geldig2 = ontleed(data2, namen, leden)
+            except Exception as e:
+                print(f"LET OP: de Koning kon zijn stopbeslissing niet herbekijken ({e}).")
+                rol2, geldig2 = None, False
+            if geldig2 and rol2 is not None:
+                return rol2, vraag2 or "Wat weet jouw Kennisbron hierover? Noem record-ID's.", f"Herbekeken na stopvoorstel: {reden2}", open2 or nieuwe_open
+            if geldig2:
+                reden, nieuwe_open = reden2, open2 or nieuwe_open
+        if moet_horen:
             lid = stil[0]
             return (lid.ROL,
-                    vraag or "Wat stelt jouw Kennisbron vast over de oorzaak van de Desync? Noem record-ID's.",
+                    ("Wat zegt jouw Kennisbron over deze open vragen: " + "; ".join(v.rstrip(" ?") for v in (nieuwe_open or open_vragen)[:3]) + "? " if (nieuwe_open or open_vragen) else
+                     "Wat stelt jouw Kennisbron vast over wat er misloopt, en wanneer? ")
+                    + "Strookt jouw bron met wat de anderen zeiden? Noem record-ID's.",
                     f"De Koning wilde stoppen ({reden}), maar {lid.NAAM} sprak nog niet: eerst diens Kennisbron horen voor een Verdict.",
                     nieuwe_open or open_vragen)
         return None, None, reden, nieuwe_open
 
+    if rol is None:
+        return None, None, reden, nieuwe_open
     return rol, vraag or "Wat weet jouw Kennisbron hierover? Noem record-ID's.", reden, nieuwe_open
+
+
+def ontleed(data, namen, leden):
+    rol = data.get("rol")
+    rol = None if rol in (None, "", "null", "None") else str(rol).strip().lower()
+    vraag = (data.get("vraag") or "").strip() or None
+    reden = (data.get("reden") or "").strip() or "geen reden opgegeven"
+    open_ = [str(v).strip() for v in (data.get("open_vragen") or []) if str(v).strip()][:6]
+    if rol is not None and rol not in namen:
+        zelfde = [l.ROL for l in leden if l.NAAM.lower() == rol or l.ROL.replace("_", " ") == rol.replace("_", " ")]
+        if not zelfde:
+            return None, vraag, reden, open_, False
+        rol = zelfde[0]
+    return rol, vraag, reden, open_, True
 
 
 def schoon_bewijs(lijst, toegestaan):
@@ -404,20 +490,72 @@ def maak_verdict(data, run_id, toegestaan, rollen):
     return verdict, geschillen
 
 
+NIVEAUS = ("minimal", "low", "medium", "high")
+
+
+def denkniveau(env):
+    waarde = os.getenv(env, "").strip().lower()
+    if env == "REASONING_KONING" and "REASONING_KONING" not in os.environ:
+        waarde = os.getenv("REASONING", "").strip().lower()
+    return waarde if waarde in NIVEAUS else None
+
+
+async def test_denkniveau(llm, env_model, env_niveau):
+    from openai import APIStatusError
+    niveau = denkniveau(env_niveau)
+    ruw = os.getenv(env_niveau, "").strip()
+    if ruw and ruw.lower() not in NIVEAUS:
+        print(f"LET OP: {env_niveau}={ruw!r} is ongeldig (kies uit {', '.join(NIVEAUS)}); denkniveau staat op de standaard van het model.")
+        os.environ[env_niveau] = ""
+        return
+    if not niveau:
+        return
+    model = os.environ[env_model]
+    try:
+        r = await llm.chat.completions.create(model=model, messages=[{"role": "user", "content": "Zeg ok."}], reasoning_effort=niveau)
+    except APIStatusError as e:
+        if e.status_code in (400, 422):
+            print(f"LET OP: {env_model}={model!r} weigert reasoning_effort={niveau!r} (HTTP {e.status_code}); denkniveau staat uit voor dit model.")
+            os.environ[env_niveau] = ""
+            return
+        print(f"LET OP: kon het denkniveau van {env_model} niet testen (HTTP {e.status_code}); het blijft op {niveau!r}.")
+        return
+    except Exception as e:
+        print(f"LET OP: kon het denkniveau van {env_model} niet testen ({e}); het blijft op {niveau!r}.")
+        return
+    if isinstance(r, str) or not getattr(r, "choices", None):
+        return
+    print(f"Denkniveau ok: {env_model}={model!r} met reasoning_effort={niveau!r}")
+
+
 async def test_verbinding():
     from openai import APIConnectionError, APIStatusError
     url = os.environ["OPENAI_BASE_URL"]
-    llm = async_llm().with_options(max_retries=1, timeout=60)
-    try:
-        await llm.chat.completions.create(model=os.environ["MODEL_KLEIN"], messages=[{"role": "user", "content": "Zeg ok."}], max_tokens=5)
-    except APIConnectionError:
-        hint = " Draait FreeLLMAPI (open http://localhost:3001)?" if "localhost" in url or "127.0.0.1" in url else ""
-        sys.exit(f"Geen verbinding met het LLM-endpoint {url}.{hint}")
-    except APIStatusError as e:
-        if e.status_code in (401, 403):
-            sys.exit(f"Het LLM-endpoint {url} weigert de key (HTTP {e.status_code}). Klopt OPENAI_API_KEY in .env?")
-        if e.status_code == 404:
-            sys.exit(f"Het LLM-endpoint {url} kent model {os.environ['MODEL_KLEIN']!r} of het pad niet (HTTP 404). Eindigt OPENAI_BASE_URL op /v1?")
+    lokaal = "localhost" in url or "127.0.0.1" in url
+    llm = async_llm().with_options(max_retries=1, timeout=90)
+    for env in ("MODEL_KLEIN", "MODEL_GROOT"):
+        model = os.environ[env]
+        try:
+            r = await llm.chat.completions.create(model=model, messages=[{"role": "user", "content": "Zeg ok."}], max_tokens=5)
+        except APIConnectionError:
+            hint = " Draait FreeLLMAPI? De desktop-app luistert standaard op http://127.0.0.1:31415/v1." if lokaal else ""
+            sys.exit(f"Geen verbinding met het LLM-endpoint {url}.{hint}")
+        except APIStatusError as e:
+            if e.status_code in (401, 403):
+                sys.exit(f"Het LLM-endpoint {url} weigert de key (HTTP {e.status_code}). Klopt OPENAI_API_KEY in .env?")
+            if e.status_code == 404:
+                sys.exit(f"Het LLM-endpoint {url} kent model {model!r} ({env}) of het pad niet (HTTP 404). Eindigt OPENAI_BASE_URL op /v1?")
+            print(f"LET OP: testcall met {env}={model!r} gaf HTTP {e.status_code}: {e.message}")
+            continue
+        if isinstance(r, str) or not getattr(r, "choices", None):
+            sys.exit(f"Het LLM-endpoint {url} gaf geen JSON terug maar {str(r)[:80]!r}…\n"
+                     "Dat is meestal een webpagina: OPENAI_BASE_URL moet naar de API wijzen en op /v1 eindigen"
+                     + (", bv. http://127.0.0.1:31415/v1 voor de FreeLLMAPI-desktop-app." if lokaal else "."))
+        print(f"Verbinding ok: {env}={model!r}")
+    if not os.getenv("REASONING_KONING") and os.getenv("REASONING"):
+        os.environ["REASONING_KONING"] = os.environ["REASONING"]
+    await test_denkniveau(llm, "MODEL_KLEIN", "REASONING")
+    await test_denkniveau(llm, "MODEL_GROOT", "REASONING_KONING")
 
 
 async def verbind_kennisbron(stack, lid):
@@ -441,11 +579,11 @@ async def verbind_kennisbron(stack, lid):
 
 async def run():
     load_dotenv(ROOT / ".env")
-    opties = {"reasoning_effort": os.environ["REASONING"]} if os.getenv("REASONING") else None
     run_id = f"{datetime.now().astimezone().isoformat(timespec='seconds')}_{uuid.uuid4().hex[:8]}"
     leden = raadsleden.alle()
     controleer(leden)
     await test_verbinding()
+    opties = {"reasoning_effort": denkniveau("REASONING")} if denkniveau("REASONING") else None
     beurten, verbruik = [], {}
     trace = {"run_id": run_id, "status": "bezig", "raadsleden": [l.ROL for l in leden], "beurten": beurten, "geschillen": [], "verbruik": verbruik}
 
@@ -467,13 +605,13 @@ async def run():
             mcp_url, tools, bestanden = await verbind_kennisbron(stack, lid)
             for p in bestanden:
                 beurt(0, lid.ROL, "bestand", bestand=f"{lid.ROL}/{p.name}")
-            instr = instructies(lid, bestanden, mcp_url)
+            instr = instructies(lid, bestanden, mcp_url, leden)
             context = "\n".join(p.read_text(encoding="utf-8") for p in bestanden)
             per_rol[lid.ROL] = (lid, mcp_url, Agent(klein, instr, name=lid.ROL, tools=tools), context)
 
         (ROOT / "verdict.json").unlink(missing_ok=True)
         bewaar("trace.json", trace)
-        open_vragen, ronde = [], 1
+        open_vragen, ronde, mislukt = [], 1, 0
         while True:
             gesproken = len(raadsleden_berichten(beurten))
             if gesproken >= BEURTENBUDGET:
@@ -507,22 +645,46 @@ async def run():
                     fout = e
                     print(f"LET OP: {lid.NAAM} gaf een fout ({e}); nieuwe poging.")
                     await asyncio.sleep(3 * (poging + 1))
+            al_gelogd = False
+            eerste_beurt = not any(b["spreker"] == rol for b in raadsleden_berichten(beurten))
+            if r is not None and mcp_url and eerste_beurt and not any("lees_kennisbron" in n for n, _ in toolcalls(r)):
+                print(f"LET OP: {lid.NAAM} las zijn volledige Kennisbron niet; één herkansing.")
+                for tool, args in toolcalls(r):
+                    beurt(ronde, rol, "toolcall", tool=tool, argumenten=args, pad=mcp_url)
+                tel_agent(verbruik, "klein", r.usage_details)
+                try:
+                    r = await agent.run(prompt + "\n\nLees eerst je volledige Kennisbron met lees_kennisbron, en antwoord dan pas.", options=opties)
+                except Exception as e:
+                    al_gelogd = True
+                    print(f"LET OP: de herkansing van {lid.NAAM} mislukte ({e}); het eerste antwoord blijft staan.")
             if r is None:
-                beurt(ronde, rol, "bericht", tekst=f"[technische fout, geen antwoord: {fout}]", bewijs=[], onbevestigd=[])
+                mislukt += 1
+                if mislukt >= 2:
+                    sys.exit(f"\nRun gestopt: twee Raadslid-beurten na elkaar mislukten ({fout}).\n"
+                             "Controleer OPENAI_BASE_URL, OPENAI_API_KEY en MODEL_KLEIN in .env, of probeer een ander model.")
+                print(f"LET OP: {lid.NAAM} gaf geen antwoord; deze beurt telt niet mee voor het budget.")
                 continue
+            mislukt = 0
 
-            tel_agent(verbruik, "klein", r.usage_details)
             calls = list(toolcalls(r))
-            for tool, args in calls:
-                beurt(ronde, rol, "toolcall", tool=tool, argumenten=args, pad=mcp_url)
-            tekst = normaliseer_ids(r.text or "")
+            if not al_gelogd:
+                tel_agent(verbruik, "klein", r.usage_details)
+                for tool, args in calls:
+                    beurt(ronde, rol, "toolcall", tool=tool, argumenten=args, pad=mcp_url)
+            tekst = normaliseer_ids(re.sub(r"<think>.*?</think>", "", r.text or "", flags=re.S)).strip()
+            ruw = None
+            if len(tekst.split()) > MAX_WOORDEN:
+                kort = await kort_in(llm, tekst, verbruik)
+                if kort:
+                    print(f"LET OP: {lid.NAAM} gaf {len(tekst.split())} woorden (met denkproces); ingekort tot {len(kort.split())}. Het origineel staat in de trace als ruwe_tekst.")
+                    ruw, tekst = tekst, kort
             gelezen = toolresultaten(r) if mcp_url else context
             eigen = [i for i in vind_ids(tekst) if i.startswith(PREFIX[rol] + "-")]
             nieuw = [i for i in eigen if i in gelezen]
             bevestigd_pool.update(nieuw)
             bewijs = [i for i in eigen if i in bevestigd_pool]
             onbevestigd = [i for i in eigen if i not in bevestigd_pool]
-            beurt(ronde, rol, "bericht", tekst=tekst, bewijs=bewijs, onbevestigd=onbevestigd)
+            beurt(ronde, rol, "bericht", tekst=tekst, bewijs=bewijs, onbevestigd=onbevestigd, **({"ruwe_tekst": ruw} if ruw else {}))
             print(f"\n[ronde {ronde}] {lid.NAAM}:\n{tekst}")
             if mcp_url and not calls:
                 print(f"LET OP: {lid.NAAM} sprak zonder zijn Kennisbron te lezen.")

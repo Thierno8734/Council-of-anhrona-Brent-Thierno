@@ -131,10 +131,13 @@ Wat je daarvoor uitzoekt: een chat-call naar hetzelfde endpoint als de Raadslede
 
 - **Zes Raadsleden**: alle Rollen doen mee (`raadsleden/`). Met maar 10 beurten moet de Koning dus echt kiezen.
 - **De Koning is een agent** (`kies_volgende()` in `council.py`, `MODEL_GROOT`). Voor elke beurt leest hij het hele debat, zijn open vragen en het resterende budget, en geeft hij JSON terug: `rol`, `vraag`, `reden` en `open_vragen`. Hij kiest wie een bewering moet toetsen, wie een tegenspraak kan beslechten en welke Rol een ontbrekend deel van de oorzaak kent.
-- **De Koning stopt zelf** (`aan: null`) zodra ingreep, mechanisme en verloop gestaafd zijn, maar pas als elk Raadslid één keer gehoord is (`IEDEREEN_HOREN=1`).
+- **De Koning stopt zelf** (`aan: null`) zodra ingreep, mechanisme en verloop één gestaafde keten vormen. Wil hij stoppen terwijl er nog Raadsleden niet spraken of open vragen zijn, dan herbekijkt hij zijn beslissing eerst zelf (reden begint met `Herbekeken na stopvoorstel`). Pas als hij dan nog iemand ongehoord laat, dwingt de code één beurt af (`IEDEREEN_HOREN=1`).
+- **Elk Raadslid leest zijn volledige bron**: bij MCP begint elke beurt met `lees_kennisbron`. Slaat een Raadslid dat over bij zijn eerste beurt, dan krijgt het één herkansing (beide pogingen staan als toolcalls in de trace).
+- **Korte, bruikbare beurten**: elk Raadslid kent de namen van de andere Raadsleden, zodat het correct naar hen verwijst. Schrijft een model zijn denkproces mee (meer dan 300 woorden), dan kort een aparte call het in tot het eindantwoord, zonder nieuwe ID's. Het origineel blijft in de trace als `ruwe_tekst`.
 - **Bewijscontrole in code**: na elke beurt kijkt de kit welke ID's een Raadslid noemt en of die echt in zijn eigen toolresultaat (MCP) of eigen bestanden stonden. Dat staat in de trace (`bewijs` en `onbevestigd` per bericht) en de Koning ziet het. In het Verdict komen alleen bevestigde ID's; een bewering zonder bevestigd bewijs wordt `null` (de tekst blijft in `onbewezen_bewering`).
 - **Verdict en geschillen** stelt de Koning op uit het debat alleen: oorzaak in drie delen met `zekerheid`, een geordend herstelplan, risico's, `voorspelling` en `geschillen` in de trace.
 - **Robuust op gratis modellen** (FreeLLMAPI): JSON wordt ook uit tekst met ```-blokken gehaald, met een nieuwe poging als het misgaat; faalt de Koning-agent toch, dan kiest hij die beurt volgens regels (zichtbaar in de `reden`). Is een MCP-server onbereikbaar, dan valt dat Raadslid terug op `kennisbronnen/<rol>/`.
+- **Denkniveau**: `REASONING` (Raadsleden) en `REASONING_KONING` (Koning) in `.env`, elk `minimal`, `low`, `medium` of `high`. Bij de start test de Council of het model dat aanvaardt; weigert het, dan staat het denkniveau voor dat model uit en loopt de run gewoon verder.
 - `KONING=regels` in `.env` draait de Council zonder LLM-Koning (handig om te testen).
 
 ## Spelregels
