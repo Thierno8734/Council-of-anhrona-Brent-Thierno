@@ -20,6 +20,8 @@ KENNISBRONNEN = ROOT / "kennisbronnen"
 ROLLEN = ("archmage", "engineer", "guardian_keeper", "historian", "oracle", "beast_master")
 PREFIX = {"archmage": "ARC", "engineer": "ENG", "guardian_keeper": "GUA", "historian": "HIS", "oracle": "ORA", "beast_master": "BEA"}
 BEURTENBUDGET = 10
+LID_LAATSTE = 6
+TEKENS_PER_TOKEN = 3.2
 SLOTS = ("ingreep", "mechanisme", "verloop")
 MAX_WOORDEN = 300
 ID_RE = re.compile(r"\b(ARC|ENG|GUA|HIS|ORA|BEA)\s?[-‐‑‒–—―−]\s?([0-9]{3})\b")
@@ -27,6 +29,7 @@ ID_RE = re.compile(r"\b(ARC|ENG|GUA|HIS|ORA|BEA)\s?[-‐‑‒–—―−]\s?([
 
 KONING_ROUTERING = """Je bent de Koning van de Council of Achrona. Je leidt een debat tussen Raadsleden over de oorzaak van de Desync.
 Je hebt zelf geen Kennisbron: je weet alleen wat in het debat gezegd is. Elk Raadslid kent maar een deel van het verhaal, heeft een eigen Belang en kan ernaast zitten.
+Schrijf alles (vraag, reden, open vragen) in het Nederlands.
 
 Het doel is een Verdict:
 - ingreep: wie deed wat, en wanneer;
@@ -35,7 +38,8 @@ Het doel is een Verdict:
 - een herstelplan en de risico's;
 telkens gestaafd met bevestigde record-ID's.
 
-Er zijn maximaal {budget} Raadslid-beurten in totaal. Elke beurt is kostbaar: kies telkens het ene Raadslid dat nu het meeste oplevert en stel een gerichte vraag.
+Er zijn maximaal {budget} Raadslid-beurten in totaal en een vast tokenbudget. Elke beurt is kostbaar: kies telkens het ene Raadslid dat nu het meeste oplevert en stel een gerichte vraag.
+Een Raadslid ziet alleen de laatste {laatste} beurten van het debat: zet in je vraag de feiten, dagen en ID's van anderen waarop het moet reageren.
 
 Zo kies je goed:
 1. Wordt een Rol, een plaats of een domein van een ander Raadslid genoemd? Laat dat Raadslid de bewering toetsen.
@@ -65,11 +69,12 @@ Antwoord met hetzelfde JSON-object als daarnet."""
 
 INKORTEN = """Hieronder staat het antwoord van een Raadslid, maar er staat ook zijn denkproces in.
 Geef alleen het eindantwoord dat het Raadslid aan de Council geeft, in hoogstens 180 woorden, in de ik-vorm.
-Neem record-ID's letterlijk over. Voeg niets toe wat er niet staat. Geen inleiding, geen uitleg over wat je doet."""
+Schrijf in het Nederlands. Neem record-ID's letterlijk over. Voeg niets toe wat er niet staat. Geen inleiding, geen uitleg over wat je doet."""
 
 
 KONING_VERDICT = """Je bent de Koning van de Council of Achrona. Het debat is voorbij en jij stelt het Council Verdict op.
 Je hebt geen Kennisbron: je gebruikt alleen wat de Raadsleden in het debat inbrachten.
+Schrijf alles in het Nederlands.
 
 Regels:
 - Gebruik als bewijs alleen ID's uit de lijst met bevestigde ID's hieronder, met een gewoon koppelteken (bv. XXX-123).
@@ -108,6 +113,33 @@ def normaliseer_ids(tekst):
 
 def vind_ids(tekst):
     return sorted({f"{a}-{b}" for a, b in ID_RE.findall(tekst or "")})
+
+
+def kort_fout(e):
+    tekst = str(e).replace("\n", " ")
+    return tekst if len(tekst) <= 220 else tekst[:220] + "…"
+
+
+def limiet_wachttijd(e):
+    tekst = str(e).lower()
+    if not any(w in tekst for w in ("rate_limit", "rate limit", "routing_exhausted", "429", "too many requests", "cooldown")):
+        return None
+    m = re.search(r"reset\D{0,6}(\d+)\s*m", tekst)
+    if m:
+        return min(300, int(m.group(1)) * 60 + 15)
+    m = re.search(r"(?:retry|reset)\D{0,12}(\d+)\s*s", tekst)
+    if m:
+        return min(300, int(m.group(1)) + 5)
+    return 60
+
+
+async def wacht_op_limiet(e, wie, wachten):
+    w = limiet_wachttijd(e)
+    if not w or wachten >= 4:
+        return False
+    print(f"LET OP: alle modellen zijn even bezet (rate limit) bij {wie}; ik wacht {w} s en probeer opnieuw ({wachten + 1}/4).")
+    await asyncio.sleep(w)
+    return True
 
 
 def lees_json(tekst):
@@ -167,7 +199,8 @@ def instructies(lid, bestanden, mcp, leden):
         "- Verwijst je Kennisbron naar een andere Rol, persoon of plaats? Meld dat, zodat de Koning die Rol kan bevragen.\n"
         "- Je hebt een Belang en kan ernaast zitten: scheid wat je bron vaststelt van wat jij erover denkt.\n"
         "- Weet je iets niet, zeg dat eerlijk. Herhaal niet wat al gezegd is. Hoogstens 180 woorden.\n"
-        "- Schrijf alleen je eindantwoord aan de Council: geen denkproces, geen plan, geen opsomming van wat je gaat opzoeken."
+        "- Schrijf alleen je eindantwoord aan de Council: geen denkproces, geen plan, geen opsomming van wat je gaat opzoeken.\n"
+        "- Antwoord altijd in het Nederlands."
     )
     if mcp:
         tekst += (
@@ -243,8 +276,8 @@ async def vraag_json(llm, systeem, gebruiker, verbruik, pogingen=3):
     niveau = denkniveau("REASONING_KONING")
     extra = {"reasoning_effort": niveau} if niveau else {}
     berichten = [{"role": "system", "content": systeem}, {"role": "user", "content": gebruiker}]
-    fout = None
-    for poging in range(pogingen):
+    fout, poging, wachten = None, 0, 0
+    while poging < pogingen:
         kwargs = {"model": model, "messages": berichten, **extra}
         if poging == 0:
             kwargs["response_format"] = {"type": "json_object"}
@@ -252,10 +285,15 @@ async def vraag_json(llm, systeem, gebruiker, verbruik, pogingen=3):
             r = await llm.chat.completions.create(**kwargs)
         except Exception as e:
             fout = e
+            if await wacht_op_limiet(e, "de Koning", wachten):
+                wachten += 1
+                continue
+            poging += 1
             await asyncio.sleep(2)
             continue
         if isinstance(r, str) or not getattr(r, "choices", None):
             fout = RuntimeError(f"het endpoint gaf geen JSON-antwoord terug: {str(r)[:80]!r}")
+            poging += 1
             await asyncio.sleep(2)
             continue
         tel_openai(verbruik, "groot", r.usage)
@@ -268,7 +306,8 @@ async def vraag_json(llm, systeem, gebruiker, verbruik, pogingen=3):
             {"role": "assistant", "content": tekst},
             {"role": "user", "content": "Antwoord alleen met één geldig JSON-object, zonder tekst eromheen."},
         ]
-    raise RuntimeError(fout)
+        poging += 1
+    raise RuntimeError(kort_fout(fout))
 
 
 async def kort_in(llm, tekst, verbruik):
@@ -278,7 +317,7 @@ async def kort_in(llm, tekst, verbruik):
             messages=[{"role": "system", "content": INKORTEN}, {"role": "user", "content": tekst}],
         )
     except Exception as e:
-        print(f"LET OP: inkorten mislukte ({e}); het volledige antwoord blijft staan.")
+        print(f"LET OP: inkorten mislukte ({kort_fout(e)}); het volledige antwoord blijft staan.")
         return None
     if isinstance(r, str) or not getattr(r, "choices", None):
         return None
@@ -290,6 +329,33 @@ async def kort_in(llm, tekst, verbruik):
         print("LET OP: de ingekorte versie bevatte nieuwe ID's; het volledige antwoord blijft staan.")
         return None
     return kort
+
+
+def tokenbudget():
+    try:
+        return max(10000, int(os.getenv("TOKENBUDGET", "150000")))
+    except ValueError:
+        return 150000
+
+
+def tokens_geschat(tekst):
+    return int(len(tekst or "") / TEKENS_PER_TOKEN) + 1
+
+
+def gebruikt(verbruik):
+    return sum(v["invoer"] + v["uitvoer"] for v in verbruik.values())
+
+
+def debat_voor_lid(beurten, namen):
+    berichten = raadsleden_berichten(beurten)
+    if len(berichten) <= LID_LAATSTE:
+        return debat_tekst(beurten, namen)
+    grens = berichten[-LID_LAATSTE]["nr"]
+    ervoor = [b["nr"] for b in beurten if b["soort"] == "routering" and b["nr"] < grens]
+    vanaf = ervoor[-1] if ervoor else grens
+    weg = len(berichten) - LID_LAATSTE
+    return (f"({weg} eerdere beurten weggelaten; de Koning zet in zijn vraag wat je ervan nodig hebt.)\n\n"
+            + debat_tekst([b for b in beurten if b["nr"] >= vanaf], namen))
 
 
 def raadsleden_berichten(beurten):
@@ -327,7 +393,7 @@ def regel_keuze(beurten, leden, waarom):
     return None, None, f"regel ({waarom}): iedereen sprak en niemand werd nog genoemd"
 
 
-async def kies_volgende(beurten, leden, llm, verbruik, open_vragen):
+async def kies_volgende(beurten, leden, llm, verbruik, open_vragen, budget_tekst="", mag_herbekijken=True):
     if os.getenv("KONING", "agent").lower() == "regels":
         rol, vraag, reden = regel_keuze(beurten, leden, "Koning in regelmodus")
         return rol, vraag, reden, open_vragen
@@ -339,15 +405,16 @@ async def kies_volgende(beurten, leden, llm, verbruik, open_vragen):
     lijst = "\n".join(f"- {l.ROL} ({l.NAAM}): {l.PERSPECTIEF} Sprak al {telling[l.ROL]} keer." for l in leden)
     gebruiker = (
         f"Raadsleden:\n{lijst}\n\n"
-        f"Nog {over} van de {BEURTENBUDGET} Raadslid-beurten over.\n\n"
+        f"Nog {over} van de {BEURTENBUDGET} Raadslid-beurten over.\n"
+        + (f"{budget_tekst}\n" if budget_tekst else "") + "\n"
         f"Jouw open vragen tot nu toe:\n" + ("\n".join(f"- {v}" for v in open_vragen) or "(nog geen)") +
         f"\n\nDebat tot nu toe:\n\n{debat_tekst(beurten, namen)}\n\n"
         "Wie spreekt nu, met welke vraag en waarom? Of stop je het debat?"
     )
     try:
-        data = await vraag_json(llm, KONING_ROUTERING.format(budget=BEURTENBUDGET), gebruiker, verbruik)
+        data = await vraag_json(llm, KONING_ROUTERING.format(budget=BEURTENBUDGET, laatste=LID_LAATSTE), gebruiker, verbruik)
     except Exception as e:
-        print(f"LET OP: de Koning-agent faalde ({e}); de Koning kiest volgens regels.")
+        print(f"LET OP: de Koning-agent faalde ({kort_fout(e)}); de Koning kiest volgens regels.")
         rol, vraag, reden = regel_keuze(beurten, leden, "Koning-agent gaf geen antwoord")
         return rol, vraag, reden, open_vragen
 
@@ -365,12 +432,12 @@ async def kies_volgende(beurten, leden, llm, verbruik, open_vragen):
                           + ". Hun Kennisbron kan net het ontbrekende stuk of het tegenbewijs bevatten.")
         if nieuwe_open:
             punten.append("- Je eigen open vragen: " + "; ".join(nieuwe_open))
-        if stil or nieuwe_open:
+        if (stil or nieuwe_open) and mag_herbekijken:
             punten.append(f"- Er zijn nog {over} Raadslid-beurten over.")
             herzien = (gebruiker + f"\n\nJe eerste beslissing: {json.dumps(data, ensure_ascii=False)}\n\n"
                        + KONING_STOP.format(punten="\n".join(punten)))
             try:
-                data2 = await vraag_json(llm, KONING_ROUTERING.format(budget=BEURTENBUDGET), herzien, verbruik)
+                data2 = await vraag_json(llm, KONING_ROUTERING.format(budget=BEURTENBUDGET, laatste=LID_LAATSTE), herzien, verbruik)
                 rol2, vraag2, reden2, open2, geldig2 = ontleed(data2, namen, leden)
             except Exception as e:
                 print(f"LET OP: de Koning kon zijn stopbeslissing niet herbekijken ({e}).")
@@ -558,7 +625,33 @@ async def test_verbinding():
     await test_denkniveau(llm, "MODEL_GROOT", "REASONING_KONING")
 
 
+async def draai_lid(agent, prompt, opties, naam):
+    fout, pogingen, wachten = None, 0, 0
+    while pogingen < 3:
+        try:
+            return await agent.run(prompt, options=opties), None
+        except Exception as e:
+            fout = e
+            if await wacht_op_limiet(e, naam, wachten):
+                wachten += 1
+                continue
+            pogingen += 1
+            print(f"LET OP: {naam} gaf een fout ({kort_fout(e)}); nieuwe poging.")
+            await asyncio.sleep(3 * pogingen)
+    return None, fout
+
+
+def alleen_bestanden():
+    return os.getenv("KENNISBRON", "").strip().lower() in ("bestanden", "bestand", "files")
+
+
 async def verbind_kennisbron(stack, lid):
+    if alleen_bestanden():
+        bestanden = kennisbron_bestanden(lid.ROL)
+        if not bestanden:
+            sys.exit(f"KENNISBRON=bestanden, maar kennisbronnen/{lid.ROL}/ is leeg. "
+                     "Pak pack.zip uit in de root van de repo, zodat de map kennisbronnen/<rol>/ de bestanden bevat.")
+        return "", [], bestanden
     mcp_url = os.getenv(f"MCP_{lid.ROL.upper()}", "").strip()
     if mcp_url:
         try:
@@ -600,7 +693,9 @@ async def run():
     bevestigd_pool = set()
 
     async with AsyncExitStack() as stack:
-        per_rol = {}
+        per_rol, instr_per_rol = {}, {}
+        if alleen_bestanden():
+            print("Kennisbronnen: bestanden uit kennisbronnen/<rol>/ (MCP staat uit via KENNISBRON=bestanden).")
         for lid in leden:
             mcp_url, tools, bestanden = await verbind_kennisbron(stack, lid)
             for p in bestanden:
@@ -608,18 +703,58 @@ async def run():
             instr = instructies(lid, bestanden, mcp_url, leden)
             context = "\n".join(p.read_text(encoding="utf-8") for p in bestanden)
             per_rol[lid.ROL] = (lid, mcp_url, Agent(klein, instr, name=lid.ROL, tools=tools), context)
+            instr_per_rol[lid.ROL] = instr
 
         (ROOT / "verdict.json").unlink(missing_ok=True)
         bewaar("trace.json", trace)
         open_vragen, ronde, mislukt = [], 1, 0
+        budget = tokenbudget()
+        kosten_lid, kosten_koning = {}, []
+
+        def schat_lid(r):
+            if kosten_lid.get(r):
+                return int(max(kosten_lid[r][-2:]) * 1.1)
+            lid_, mcp_, _, _ = per_rol[r]
+            vraag_ = tokens_geschat(instr_per_rol[r]) + tokens_geschat(debat_voor_lid(beurten, namen)) + 300
+            return int(((2 * vraag_ + 6500) if mcp_ else vraag_) * 1.15 + 900)
+
+        def schat_routering():
+            formule = int((tokens_geschat(debat_tekst(beurten, namen)) + 1800) * 1.15 + 500)
+            return max(formule, int(max(kosten_koning[-2:]) * 1.1)) if kosten_koning else formule
+
+        def schat_verdict():
+            formule = int((tokens_geschat(debat_tekst(beurten, namen)) + 2000) * 1.15 + 2500)
+            return max(formule, int(max(kosten_koning[-2:]) * 1.5)) if kosten_koning else formule
+
         while True:
             gesproken = len(raadsleden_berichten(beurten))
+            over_tokens = budget - gebruikt(verbruik)
+            reserve, routering_kost = schat_verdict(), schat_routering()
+            kosten = {r: schat_lid(r) for r in per_rol}
+            goedkoopst = min(kosten.values())
             if gesproken >= BEURTENBUDGET:
                 rol, vraag, reden = None, None, f"Beurtenbudget op ({BEURTENBUDGET} Raadslid-beurten)"
+            elif over_tokens < reserve + routering_kost + goedkoopst:
+                rol, vraag, reden = None, None, (f"Tokenbudget: nog {over_tokens} van {budget} tokens over; een keuze van de Koning (~{routering_kost}) "
+                                                 f"plus een Raadslid-beurt (~{goedkoopst}) past niet meer naast de reserve van ~{reserve} voor het Verdict.")
             else:
                 trace["aan_het_woord"] = "koning"
                 bewaar("trace.json", trace)
-                rol, vraag, reden, open_vragen = await kies_volgende(beurten, leden, llm, verbruik, open_vragen)
+                gemiddeld = int(sum(kosten.values()) / len(kosten))
+                budget_tekst = (f"Tokenbudget: nog ongeveer {over_tokens} van {budget} tokens. Een Raadslid-beurt kost ongeveer {gemiddeld} tokens, "
+                                f"en ~{reserve} is gereserveerd voor het Verdict: stop tijdig als het budget krap wordt.")
+                mag_herbekijken = over_tokens >= reserve + 2 * routering_kost + goedkoopst
+                voor = gebruikt(verbruik)
+                rol, vraag, reden, open_vragen = await kies_volgende(beurten, leden, llm, verbruik, open_vragen, budget_tekst, mag_herbekijken)
+                if gebruikt(verbruik) > voor:
+                    kosten_koning.append(gebruikt(verbruik) - voor)
+                if rol is not None:
+                    over_na = budget - gebruikt(verbruik)
+                    reserve = schat_verdict()
+                    if over_na < kosten[rol] + reserve:
+                        reden = (f"De Koning koos {namen[rol]} ({reden}), maar die beurt (~{kosten[rol]} tokens) past niet meer in het tokenbudget: "
+                                 f"nog {over_na} van {budget} tokens over, ~{reserve} gereserveerd voor het Verdict.")
+                        rol, vraag = None, None
             if rol is not None:
                 ronde = gesproken // len(leden) + 1
             velden = {"aan": rol, "vraag": vraag, "reden": reden}
@@ -633,18 +768,11 @@ async def run():
                 break
 
             lid, mcp_url, agent, context = per_rol[rol]
-            prompt = f"Debat tot nu toe:\n\n{debat_tekst(beurten[:-1], namen)}\n\nVraag van de Koning aan jou: {vraag}"
+            prompt = f"Debat tot nu toe:\n\n{debat_voor_lid(beurten[:-1], namen)}\n\nVraag van de Koning aan jou: {vraag}"
+            voor_lid = gebruikt(verbruik)
             trace["aan_het_woord"] = rol
             bewaar("trace.json", trace)
-            r, fout = None, None
-            for poging in range(3):
-                try:
-                    r = await agent.run(prompt, options=opties)
-                    break
-                except Exception as e:
-                    fout = e
-                    print(f"LET OP: {lid.NAAM} gaf een fout ({e}); nieuwe poging.")
-                    await asyncio.sleep(3 * (poging + 1))
+            r, fout = await draai_lid(agent, prompt, opties, lid.NAAM)
             al_gelogd = False
             eerste_beurt = not any(b["spreker"] == rol for b in raadsleden_berichten(beurten))
             if r is not None and mcp_url and eerste_beurt and not any("lees_kennisbron" in n for n, _ in toolcalls(r)):
@@ -660,7 +788,7 @@ async def run():
             if r is None:
                 mislukt += 1
                 if mislukt >= 2:
-                    sys.exit(f"\nRun gestopt: twee Raadslid-beurten na elkaar mislukten ({fout}).\n"
+                    sys.exit(f"\nRun gestopt: twee Raadslid-beurten na elkaar mislukten ({kort_fout(fout)}).\n"
                              "Controleer OPENAI_BASE_URL, OPENAI_API_KEY en MODEL_KLEIN in .env, of probeer een ander model.")
                 print(f"LET OP: {lid.NAAM} gaf geen antwoord; deze beurt telt niet mee voor het budget.")
                 continue
@@ -684,8 +812,11 @@ async def run():
             bevestigd_pool.update(nieuw)
             bewijs = [i for i in eigen if i in bevestigd_pool]
             onbevestigd = [i for i in eigen if i not in bevestigd_pool]
+            kosten_lid.setdefault(rol, []).append(gebruikt(verbruik) - voor_lid)
+            trace["tokens"] = {"budget": budget, "gebruikt": gebruikt(verbruik)}
             beurt(ronde, rol, "bericht", tekst=tekst, bewijs=bewijs, onbevestigd=onbevestigd, **({"ruwe_tekst": ruw} if ruw else {}))
             print(f"\n[ronde {ronde}] {lid.NAAM}:\n{tekst}")
+            print(f"         tokens: {gebruikt(verbruik)} van {budget}")
             if mcp_url and not calls:
                 print(f"LET OP: {lid.NAAM} sprak zonder zijn Kennisbron te lezen.")
             if onbevestigd:
@@ -719,11 +850,16 @@ async def run():
     if onbekend:
         print(f"LET OP: onbekend gebleven: {', '.join(onbekend)}")
 
+    totaal = gebruikt(verbruik)
+    trace["tokens"] = {"budget": tokenbudget(), "gebruikt": totaal}
+    if totaal > tokenbudget():
+        print(f"LET OP: de run gebruikte {totaal} tokens, meer dan het tokenbudget van {tokenbudget()}.")
     trace["status"], trace["aan_het_woord"] = "klaar", None
     bewaar("trace.json", trace)
     bewaar("verdict.json", verdict)
 
     print(f"\nKlaar: verdict.json en trace.json geschreven (run_id {run_id}).")
+    print(f"Tokens: {gebruikt(verbruik)} van het tokenbudget {tokenbudget()}.")
     for model, v in verbruik.items():
         print(f"Verbruik {model}: {v['beurten']} beurten, {v['invoer']} tokens in ({v['gecached']} gecached), {v['uitvoer']} tokens uit")
 

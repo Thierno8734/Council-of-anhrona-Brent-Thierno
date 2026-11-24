@@ -138,6 +138,9 @@ Wat je daarvoor uitzoekt: een chat-call naar hetzelfde endpoint als de Raadslede
 - **Verdict en geschillen** stelt de Koning op uit het debat alleen: oorzaak in drie delen met `zekerheid`, een geordend herstelplan, risico's, `voorspelling` en `geschillen` in de trace.
 - **Robuust op gratis modellen** (FreeLLMAPI): JSON wordt ook uit tekst met ```-blokken gehaald, met een nieuwe poging als het misgaat; faalt de Koning-agent toch, dan kiest hij die beurt volgens regels (zichtbaar in de `reden`). Is een MCP-server onbereikbaar, dan valt dat Raadslid terug op `kennisbronnen/<rol>/`.
 - **Denkniveau**: `REASONING` (Raadsleden) en `REASONING_KONING` (Koning) in `.env`, elk `minimal`, `low`, `medium` of `high`. Bij de start test de Council of het model dat aanvaardt; weigert het, dan staat het denkniveau voor dat model uit en loopt de run gewoon verder.
+- **Zonder MCP**: `KENNISBRON=bestanden` in `.env` negeert alle `MCP_`-paden; elk Raadslid krijgt dan zijn bestanden uit `kennisbronnen/<rol>/` (uit `pack.zip`) in de prompt. Er zijn dan geen toolcalls nodig, dus FreeLLMAPI kan ook modellen zonder tool-calling gebruiken.
+- **Tokenbudget** (`TOKENBUDGET`, standaard 150000 per run: genoeg voor alle 10 beurten met speling, terwijl elke call afzonderlijk klein blijft): de Council schat voor elke beurt de kost (op basis van wat eerdere beurten echt kostten) en houdt altijd een reserve over voor het Verdict. Past een beurt niet meer, dan stopt de Koning met die reden in de trace. Raadsleden zien alleen de laatste 6 beurten; de Koning zet in zijn vraag wat ze nodig hebben. Het verbruik staat in `trace.json` onder `tokens` en `verbruik`.
+- **Rate limits**: zijn alle modellen even bezet (bv. FreeLLMAPI `routing_exhausted`), dan wacht de Council tot de limiet vrijkomt (hoogstens 4 keer, elk hoogstens 5 minuten) in plaats van de beurt te verliezen.
 - `KONING=regels` in `.env` draait de Council zonder LLM-Koning (handig om te testen).
 
 ## Spelregels
