@@ -127,6 +127,16 @@ Raadsleden + debat tot nu toe  ──►  LLM (MODEL_GROOT)  ──►  {"rol": 
 
 Wat je daarvoor uitzoekt: een chat-call naar hetzelfde endpoint als de Raadsleden, een instructie die zegt wat een goede keuze is (en wanneer de Koning stopt), en het antwoord als JSON uitlezen. Zoektermen: *structured output*, *JSON mode*, *group chat manager* of *speaker selection* (MAF). Let op: `kies_volgende()` is gewone, niet-async code, en modellen zetten soms tekst rond hun JSON.
 
+## Onze Council (Brent & Thierno)
+
+- **Zes Raadsleden**: alle Rollen doen mee (`raadsleden/`). Met maar 10 beurten moet de Koning dus echt kiezen.
+- **De Koning is een agent** (`kies_volgende()` in `council.py`, `MODEL_GROOT`). Voor elke beurt leest hij het hele debat, zijn open vragen en het resterende budget, en geeft hij JSON terug: `rol`, `vraag`, `reden` en `open_vragen`. Hij kiest wie een bewering moet toetsen, wie een tegenspraak kan beslechten en welke Rol een ontbrekend deel van de oorzaak kent.
+- **De Koning stopt zelf** (`aan: null`) zodra ingreep, mechanisme en verloop gestaafd zijn, maar pas als elk Raadslid één keer gehoord is (`IEDEREEN_HOREN=1`).
+- **Bewijscontrole in code**: na elke beurt kijkt de kit welke ID's een Raadslid noemt en of die echt in zijn eigen toolresultaat (MCP) of eigen bestanden stonden. Dat staat in de trace (`bewijs` en `onbevestigd` per bericht) en de Koning ziet het. In het Verdict komen alleen bevestigde ID's; een bewering zonder bevestigd bewijs wordt `null` (de tekst blijft in `onbewezen_bewering`).
+- **Verdict en geschillen** stelt de Koning op uit het debat alleen: oorzaak in drie delen met `zekerheid`, een geordend herstelplan, risico's, `voorspelling` en `geschillen` in de trace.
+- **Robuust op gratis modellen** (FreeLLMAPI): JSON wordt ook uit tekst met ```-blokken gehaald, met een nieuwe poging als het misgaat; faalt de Koning-agent toch, dan kiest hij die beurt volgens regels (zichtbaar in de `reden`). Is een MCP-server onbereikbaar, dan valt dat Raadslid terug op `kennisbronnen/<rol>/`.
+- `KONING=regels` in `.env` draait de Council zonder LLM-Koning (handig om te testen).
+
 ## Spelregels
 
 - Eén Raadslid per Rol. Elk Raadslid leest alleen de Kennisbron van zijn eigen Rol. De viewer en de jury kijken dat na in de trace.
