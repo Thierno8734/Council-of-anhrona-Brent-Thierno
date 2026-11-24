@@ -205,6 +205,28 @@
         "Hoe hangen de kabels bij de oude eik (BEA-109, BEA-115) samen met de onrust van dag 10 (BEA-019, BEA-020), of zijn dat twee losse oorzaken?",
         "Hebben de Guardian Keeper of de Oracle een bres, lek of teken op dag 10 tussen 02:40 en 04:50 vastgelegd?"
       ]
+    },
+    {
+      "nr": 19,
+      "ronde": 1,
+      "spreker": "historian",
+      "soort": "bericht",
+      "tekst": "Koning, mijn bron bevat **geen eerdere activatie van de hulpslag**, geen andere ingreep in de datatoren en geen goedkeuring vooraf. ENG-105 en ARC-106 staan er niet in.\n\nWat wel vastligt:\n- De datatoren is 23 jaar geleden gebouwd en op de Kroonklok aangesloten (HIS-005, HIS-006). De woudkabels zijn toen gelegd (HIS-007).\n- Dag 3, 08:30: inspectie van de woudkabels, \"niets gewijzigd\" (HIS-014).\n- In 23 jaar datanet is geen enkele hapering van de leylijnen vastgelegd (HIS-106).\n- Dag 10, 04:45: de Burchtader stokte even (HIS-035). Dag 10, 04:50: klacht over half aangekomen berichten (HIS-036).\n\nLet op: HIS-036 is vastgelegd op dag 9, 23:55, vóór het gebeuren. Dat botst met HIS-103, dat stelt dat vastlegging altijd gelijk is aan gebeurd. Dag 22, 04:15 is er een lek bij poort oost (HIS-053), vastgelegd om 01:50. Of dat hetzelfde is als het pakketverlies van de Engineer, kan ik niet bevestigen.\n\nVoor de Koning: HIS-109 en HIS-110 noemen een klokkenmeester en een waarschuwing dat een tweede pols de Kroonklok uit de maat brengt. Ik kan niet vaststellen of een hulpslag zo'n tweede pols is. Dat is een vraag voor de Engineer en de klokkenmeester.\n\nMijn mening, geen vastgestelde feit: ik denk dat een oud kwaad terugkeert (HIS-114). Mijn bron geeft daar geen oorzaak voor. Ik heb een belang bij het archief en de Stille Winter, dus neem dit als mijn overtuiging.",
+      "bewijs": [
+        "HIS-005",
+        "HIS-006",
+        "HIS-007",
+        "HIS-014",
+        "HIS-035",
+        "HIS-036",
+        "HIS-053",
+        "HIS-103",
+        "HIS-106",
+        "HIS-109",
+        "HIS-110",
+        "HIS-114"
+      ],
+      "onbevestigd": []
     }
   ],
   "geschillen": [],
@@ -216,15 +238,15 @@
       "uitvoer": 5241
     },
     "klein": {
-      "beurten": 3,
-      "invoer": 29832,
+      "beurten": 4,
+      "invoer": 41750,
       "gecached": 0,
-      "uitvoer": 5335
+      "uitvoer": 8681
     }
   },
-  "aan_het_woord": "historian",
+  "aan_het_woord": "koning",
   "tokens": {
     "budget": 150000,
-    "gebruikt": 47393
+    "gebruikt": 69155
   }
 }
