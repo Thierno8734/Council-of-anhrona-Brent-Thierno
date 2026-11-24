@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "run_id": "2026-11-24T14:16:48+01:00_9a866dc0",
   "samenvatting": "De Desync lijkt te zijn ontstaan doordat de hulpslag in de datatoren op dag 10 om 02:40 als eigen pols werd geactiveerd, los van de Kroonklok, nadat de Archmage op dag 8 een geheime toestemming had gegeven. Een eigen pols die niet op de Kroonklok loopt, kan volgens de schildregels de timing verstoren, wat past bij het schild benedenstad op dag 10 en de klachten over half aankomende berichten. Het verband met het pakketverlies op poort oost van dag 22 is niet gemeten en blijft een aanname, en de tijdstempels van enkele registers zijn onderling inconsistent.",
   "oorzaak": {
@@ -36,10 +37,44 @@
         "BEA-113"
       ],
       "zekerheid": 0.3
+=======
+  "run_id": "2026-11-24T14:23:54+01:00_c3db44e7",
+  "samenvatting": "De Desync begon op dag 10 om 02:40, toen de Engineer zelf de hulpslag in de kelder van de datatoren activeerde als eigen pols voor het datanet (ENG-011, ENG-106). De doorvoer steeg daarna met 38% (ENG-012) en er kwamen berichten half aan (ENG-107), maar een definitief oorzaakverband is niet vastgesteld. Na dag 10 komen verstoringen terug in een ritme van ongeveer elke vier dagen, en dag 34 is de eerstvolgende verwachte dag als niemand ingrijpt.",
+  "oorzaak": {
+    "ingreep": {
+      "bewering": "Op dag 10 om 02:40 activeerde de Engineer zelf de hulpslag in de kelder van de datatoren als eigen pols voor het datanet, los van de Kroonklok.",
+      "bewijs": [
+        "ENG-011",
+        "ENG-106"
+      ],
+      "zekerheid": 0.7
+    },
+    "mechanisme": {
+      "bewering": "De eigen pols veranderde de belasting van het datanet: de doorvoer steeg om 03:00 met 38% (ENG-012), en om 04:50 meldden klachten half aangekomen berichten (ENG-107). Dat de verliezen aan de hulpslag te wijten zijn, is niet bewezen, omdat ENG-107 geen pakketverlies noemt.",
+      "bewijs": [
+        "ENG-012",
+        "ENG-107"
+      ],
+      "zekerheid": 0.4
+    },
+    "verloop": {
+      "bewering": "Na dag 10 komen verstoringen terug op een vast ritme van ongeveer elke vier dagen: dag 10, dag 14 (Burchtader-stokking), dag 22 (poort oost en schild, plus dierenonrust) en dag 26 en dag 30 (dierenonrust). Dag 18 heeft geen record. Waarom dit ritme optreedt, is in het debat niet verklaard.",
+      "bewijs": [
+        "ENG-012",
+        "ARC-015",
+        "ENG-026",
+        "GUA-043",
+        "BEA-046",
+        "BEA-055",
+        "BEA-064"
+      ],
+      "zekerheid": 0.5
+>>>>>>> 39dd04c (FinaleVersie1)
     }
   },
   "acties": [
     {
+<<<<<<< HEAD
       "actie": "Zet de hulpslag in de datatoren direct terug op de Kroonklok en laat de Engineer schriftelijk bevestigen dat er geen eigen pols meer draait.",
       "reden": "De eigen pols van dag 10 is de vastgestelde ingreep en moet de eerste stap zijn om verdere schade te stoppen. Het terugzetten is eerder getest en werkte (ENG-061, ENG-114).",
       "bewijs": [
@@ -53,11 +88,28 @@
       "reden": "Het schildmechanisme uit artikel 3 is de schakel tussen de eigen pols en de symptomen. Zonder bewaking blijft die schakel onbekend.",
       "bewijs": [
         "GUA-104",
+=======
+      "actie": "Zet de hulpslag (eigen pols voor het datanet) stapsgewijs terug naar de normale aansturing via de Kroonklok, onder toezicht van de Engineer, en meet de doorvoer tot die op het basisniveau ligt.",
+      "reden": "Na de activering steeg de doorvoer met 38% en kwamen berichten half aan. Dit stopt de schade die nu nog optreedt.",
+      "bewijs": [
+        "ENG-011",
+        "ENG-012",
+        "ENG-106",
+        "ENG-107"
+      ]
+    },
+    {
+      "actie": "Laat tussen 03:00 en 06:00 rondes lopen bij de schilden en controleer schilden die van binnenuit opengingen.",
+      "reden": "Tussen 03:00 en 06:00 liepen geen rondes, en in dat uur gingen de schilden benedenstad (dag 10) en poort oost (dag 22) open zonder dat iemand toezicht hield.",
+      "bewijs": [
+        "GUA-106",
+>>>>>>> 39dd04c (FinaleVersie1)
         "GUA-019",
         "GUA-043"
       ]
     },
     {
+<<<<<<< HEAD
       "actie": "Laat de Koning de 'hogerhand' bevragen en de Archmage zijn toestemming van dag 8 met naam, tijdstip en schriftelijke opdracht vastleggen.",
       "reden": "De geheime toestemming is niet in de registers terechtgekomen en de hogerhand is niet bij naam genoemd. Zonder naam blijft verantwoordelijkheid onduidelijk.",
       "bewijs": [
@@ -82,11 +134,42 @@
         "ARC-106",
         "ENG-105",
         "HIS-110"
+=======
+      "actie": "Controleer de tijdstempels van de Historian, de Archmage en de Guardian Keeper en stel vast welke waarden kloppen.",
+      "reden": "HIS-103 stelt dat vastgelegd gelijk is aan gebeurd, maar HIS-035, HIS-036 en HIS-053 spreken dat tegen. GUA-115 noemt een melding op 01:50, ruim voor de opening om 04:15 die GUA-043 noemt.",
+      "bewijs": [
+        "HIS-103",
+        "HIS-035",
+        "HIS-036",
+        "HIS-053",
+        "ARC-015",
+        "GUA-115",
+        "GUA-043"
+      ]
+    },
+    {
+      "actie": "Zoek de Kroonklok-logs van dag 10 op en vergelijk ze met de installatielog van de Engineer.",
+      "reden": "Geen van de bronnen toont een klokingreep op dag 10. Dat moet worden vastgesteld voordat de Kroonklok als oorzaak wordt uitgesloten.",
+      "bewijs": [
+        "ARC-104",
+        "ENG-102",
+        "ENG-011"
+      ]
+    },
+    {
+      "actie": "Bewaak het venster van dag 34 (03:00 tot 06:00) en meet of pakketverlies of schildopeningen terugkomen, en controleer ook dag 18.",
+      "reden": "Het ritme van vier dagen voorspelt dag 34. Dag 18 heeft nog geen record, dus die dag is niet uitgesloten.",
+      "bewijs": [
+        "BEA-055",
+        "BEA-064",
+        "ENG-026"
+>>>>>>> 39dd04c (FinaleVersie1)
       ]
     }
   ],
   "risicos": [
     {
+<<<<<<< HEAD
       "risico": "De poort oost-storing van dag 22 is niet door de eigen pols veroorzaakt, maar door een infiltrant of hackers.",
       "mitigatie": "Laat de firewallregels en het buitenzijde-toezicht onafhankelijk nakijken. ENG-027 en de controle van GUA-043 en GUA-044 moeten als bewijsmateriaal worden vastgelegd."
     },
@@ -110,6 +193,29 @@
       "BEA-113",
       "BEA-055",
       "BEA-056"
+=======
+      "risico": "Het terugzetten van de hulpslag kan dataverlies veroorzaken of het net verder laten haperen.",
+      "mitigatie": "Maak eerst een back-up van lopende berichten en voer de omschakeling stapsgewijs uit, met meting van de doorvoer na elke stap."
+    },
+    {
+      "risico": "De bron van de openingen aan de schilden van binnenuit (GUA-019, GUA-043) is niet bekend. Een interne actor is niet bewezen.",
+      "mitigatie": "Controleer toegangslogs van de schildbedieningen en gebruik het inbraakalarm ENG-027 niet als bewijs, omdat het op een vermoeden is gebaseerd."
+    },
+    {
+      "risico": "Het ritme van vier dagen is niet verklaard en dag 18 heeft geen records. Het verband tussen de hulpslag en de latere verstoringen is niet vastgesteld.",
+      "mitigatie": "Verzamel meetbare records (doorvoer, pakketverlies, schildstatus) over de hele periode, ook voor dag 18, voordat het verband wordt vastgesteld of uitgesloten."
+    }
+  ],
+  "voorspelling": {
+    "dag": 34,
+    "bewering": "Als niemand ingrijpt, komt de Desync opnieuw op dag 34 terug, waarschijnlijk in het venster rond 04:00 tot 05:00 zoals op dag 10 en dag 22.",
+    "bewijs": [
+      "BEA-055",
+      "BEA-064",
+      "ARC-015",
+      "ENG-026",
+      "GUA-043"
+>>>>>>> 39dd04c (FinaleVersie1)
     ]
   }
 }
