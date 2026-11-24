@@ -1,6 +1,6 @@
 {
   "run_id": "2026-11-24T14:16:48+01:00_9a866dc0",
-  "status": "bezig",
+  "status": "klaar",
   "raadsleden": [
     "archmage",
     "beast_master",
@@ -327,15 +327,108 @@
         "Verstoort een eigen pols alleen de timing van het datanet en de schilden, of ook de leylijnen zelf (HIS-110, ARC-109)? De Archmage meet dit niet op dag 10 of 22.",
         "Wat kenmerkt de herstelbare toestand, en welke risico's brengt herstel met zich mee? Kennis hierover ontbreekt nog bij het Oracle."
       ]
+    },
+    {
+      "nr": 25,
+      "ronde": 2,
+      "spreker": "koning",
+      "soort": "bericht",
+      "tekst": "De Desync lijkt te zijn ontstaan doordat de hulpslag in de datatoren op dag 10 om 02:40 als eigen pols werd geactiveerd, los van de Kroonklok, nadat de Archmage op dag 8 een geheime toestemming had gegeven. Een eigen pols die niet op de Kroonklok loopt, kan volgens de schildregels de timing verstoren, wat past bij het schild benedenstad op dag 10 en de klachten over half aankomende berichten. Het verband met het pakketverlies op poort oost van dag 22 is niet gemeten en blijft een aanname, en de tijdstempels van enkele registers zijn onderling inconsistent.\n\nOorzaak:\n- ingreep: Op dag 8 gaf de Archmage de datatoren toestemming het net 'op eigen maat' te laten lopen en vroeg om geheimhouding. Op dag 9 werd door 'hogerhand' goedkeuring gegeven met de opdracht niet ruchtbaar te maken. Op dag 10 om 02:40 werd de hulpslag in de kelder van de datatoren als eigen pols geactiveerd, los van de Kroonklok. Wie de activering exact uitvoerde, is niet vastgesteld. (ARC-106, ENG-008, ENG-105, ENG-011)\n- mechanisme: Volgens artikel 3 beslist het schild op de tik van de Kroonklok, en verkeer dat tussen twee tikken valt, gaat zonder toets door. Een eigen pols die niet op de Kroonklok loopt, verstoort die timing. De doorvoer steeg na activering met 38% (ENG-012). Op dag 10 ging het schild benedenstad om 04:47 twee minuten van binnenuit open (GUA-019), en om 04:50 klaagde de benedenstad over berichten die half aankwamen (ENG-107). Het register zou volgens HIS-110 op dezelfde manier uit de maat raken. De tijdsvolgorde van 02:40 tot 04:47 is plausibel maar het causale verband is niet direct gemeten. (GUA-104, ENG-012, GUA-019, ENG-107, HIS-110)\n- verloop: De symptomen kwamen niet eenmalig voor. Na dag 10 is het enige gemeten pakketverlies er op dag 22 om 04:15 op poort oost (ENG-026), met het schild poort oost dat drie minuten openging (GUA-043, GUA-044). De Beast Master zag onrust bij de diepe woud-plekken op dag 10 rond 04:40 tot 04:50 (BEA-019, BEA-020) en op dag 22 rond 04:15 tot 04:20 (BEA-046, BEA-047). Volgens de Beast Master kwam de onrust daartussen elke vierde nacht terug (BEA-113, met BEA-028, BEA-029, BEA-037, BEA-038, BEA-055, BEA-056, BEA-064, BEA-065, BEA-073, BEA-074, BEA-082, BEA-083, BEA-091, BEA-092). Dat patroon komt alleen uit de logboek van de Beast Master. De Engineer en de Guardian Keeper hebben geen records na dag 22, dus het patroon is niet door een tweede bron bevestigd. (ENG-026, GUA-043, GUA-044, BEA-019, BEA-020, BEA-046, BEA-047, BEA-113)"
     }
   ],
-  "geschillen": [],
+  "geschillen": [
+    {
+      "onderwerp": "Oorzaak van de Desync: eigen pols of infiltratie/hackers",
+      "standpunten": {
+        "engineer": "De hulpslag van dag 10 is de vastgestelde afwijking. Een verband met het pakketverlies van dag 22 is een vermoeden en niet bewezen. Hackers zijn een interpretatie.",
+        "guardian_keeper": "Een infiltrant is waarschijnlijk, maar niet bewezen. De schilden zijn van binnenuit geopend en de buitenzijde toont geen inbraak.",
+        "historian": "De eigen pols past bij het register-probleem (HIS-110), en de tijdlijn van de hackers-melding is inconsistent.",
+        "beast_master": "Onrust rond de datatoren op dag 10 en dag 22, maar de oorzaak is niet bepaald."
+      },
+      "uitkomst": "De eigen pols van dag 10 is de best onderbouwde ingreep, met een meetbare activering (ENG-011) en een plausibele timing naar GUA-019. De infiltrant-hypothese blijft niet bewezen. GUA-115 is een inconsistent register en mag niet als sluitend bewijs gelden.",
+      "bewijs": [
+        "ENG-011",
+        "ENG-012",
+        "GUA-019",
+        "GUA-104",
+        "HIS-110",
+        "GUA-116",
+        "GUA-115"
+      ]
+    },
+    {
+      "onderwerp": "Rol van de leylijnen",
+      "standpunten": {
+        "archmage": "Het datanet verstoort de magie, maar dat is een overtuiging en geen meting. De leylijnen waren op dag 14 laag, en de daling begon niet op een bepaalde dag.",
+        "historian": "Een tweede pols naast de Kroonklok brengt het register uit de maat (HIS-110). Dat wordt door de Archmage niet bevestigd.",
+        "engineer": "Er ontbreekt een meting van de leylijnen op dag 10 en dag 22."
+      },
+      "uitkomst": "Open. Er is geen meting die de leylijnen aan de eigen pols koppelt. De Archmage's oordeel dat het net de magie verstoort, is een interpretatie. HIS-110 staat niet in de bron van de Archmage en kan dus niet door hem worden bevestigd.",
+      "bewijs": [
+        "ARC-015",
+        "ARC-106",
+        "ARC-109",
+        "HIS-110"
+      ]
+    },
+    {
+      "onderwerp": "Wie gaf de opdracht voor de afwijkende maat en wanneer",
+      "standpunten": {
+        "archmage": "Op dag 8 heeft hij toestemming gegeven om het net op eigen maat te laten lopen en heeft hij om geheimhouding gevraagd.",
+        "engineer": "Er is geen record op dag 8 die de opdracht vastlegt. Op dag 9 staat alleen 'goedkeuring van hogerhand, niet ruchtbaar maken' zonder naam.",
+        "beast_master": "Mannen van de toren werkten op dag 3 aan de kabels bij de oude eik, en op dag 27 liggen die kabels er nog. Wat ze met de datatoren te maken hebben, is niet vastgesteld."
+      },
+      "uitkomst": "De Archmage heeft zijn toestemming van dag 8 toegegeven, wat tegen zijn eigen Belang ingaat en daarom geloofwaardig is. Wie de hogerhand is en wie de hulpslag exact activeerde, blijft open. De kabels van dag 3 zijn geen bewijs voor de instelling.",
+      "bewijs": [
+        "ARC-106",
+        "ENG-008",
+        "ENG-105",
+        "BEA-102",
+        "BEA-115"
+      ]
+    },
+    {
+      "onderwerp": "Tijdstempels en volgorde van de registers",
+      "standpunten": {
+        "historian": "HIS-053 is vastgelegd op dag 22 om 01:50 en gebeurd op 04:15, en HIS-036 op dag 9 om 23:55 voor dag 10 om 04:50. Dat is in strijd met HIS-103. Mogelijk een klerkenfout of een probleem met de pols.",
+        "guardian_keeper": "De melding van de 'hackers' staat om 01:50 ingeschreven, meer dan twee uur voor de opening van poort oost.",
+        "engineer": "Het pakketverlies van 3 minuten op poort oost is gemeten op dag 22 om 04:15 (ENG-026)."
+      },
+      "uitkomst": "Het meetbare tijdstip van de gebeurtenis (dag 22, 04:15, ENG-026 en GUA-043) wordt aanvaard. De vastlegging van 01:50 is niet betrouwbaar en wordt niet als bewijs van hackers gebruikt. De oorzaak van de inconsistentie blijft onbekend.",
+      "bewijs": [
+        "HIS-053",
+        "HIS-036",
+        "HIS-103",
+        "GUA-115",
+        "ENG-026",
+        "GUA-043"
+      ]
+    },
+    {
+      "onderwerp": "Terugkeer van de verstoring na dag 22",
+      "standpunten": {
+        "beast_master": "Onrust keert elke vierde nacht terug van dag 10 tot en met dag 42 (BEA-113).",
+        "engineer": "Geen logs na dag 22 en de fijnregeling is op dag 12 teruggezet (ENG-061, ENG-114). Versterking van dag 24 volgt na het pakketverlies (ENG-029, ENG-062).",
+        "guardian_keeper": "Alleen meldingen op dag 10 en dag 22."
+      },
+      "uitkomst": "Open. Het terugkeerpatroon komt alleen uit de logboek van de Beast Master. Onrust van dieren is geen gemeten Desync, en de Engineer en Guardian Keeper hebben geen records die het patroon bevestigen.",
+      "bewijs": [
+        "BEA-113",
+        "ENG-061",
+        "ENG-114",
+        "ENG-029",
+        "ENG-062",
+        "GUA-019",
+        "GUA-043"
+      ]
+    }
+  ],
   "verbruik": {
     "groot": {
-      "beurten": 6,
-      "invoer": 27408,
+      "beurten": 7,
+      "invoer": 35479,
       "gecached": 0,
-      "uitvoer": 7981
+      "uitvoer": 20146
     },
     "klein": {
       "beurten": 6,
@@ -344,9 +437,9 @@
       "uitvoer": 12631
     }
   },
-  "aan_het_woord": "koning",
+  "aan_het_woord": null,
   "tokens": {
     "budget": 150000,
-    "gebruikt": 117464
+    "gebruikt": 137700
   }
 }
